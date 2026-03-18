@@ -1,0 +1,13 @@
+{
+"type": "FeatureCollection",
+"name": "poi_bibliotek__bibliotek",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Namn": "Uppsala C" }, "geometry": { "type": "Point", "coordinates": [ 17.645881910008143, 59.858283818558604 ] } },
+{ "type": "Feature", "properties": { "Namn": "Biblioteket" }, "geometry": { "type": "Point", "coordinates": [ 17.635425641278363, 59.860829000992247 ] } },
+{ "type": "Feature", "properties": { "Namn": "Vaksala torg" }, "geometry": { "type": "Point", "coordinates": [ 17.64708813443395, 59.861680499560862 ] } },
+{ "type": "Feature", "properties": { "Namn": "Domkyrkan" }, "geometry": { "type": "Point", "coordinates": [ 17.632311200615309, 59.858154179525847 ] } },
+{ "type": "Feature", "properties": { "Namn": "Stadsparken" }, "geometry": { "type": "Point", "coordinates": [ 17.642412794253278, 59.852760341128956 ] } },
+{ "type": "Feature", "properties": { "Namn": "Carolina Rediviva" }, "geometry": { "type": "Point", "coordinates": [ 17.631747144925736, 59.855327647022271 ] } }
+]
+}

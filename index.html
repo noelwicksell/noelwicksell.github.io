@@ -1,12 +1,733 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Noel Wicksell</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rullstolstillgänglighet i Uppsala innerstad</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-dark: #0d0d2b;
+      --bg-mid: #1a1a4e;
+      --accent: #4fc3f7;
+      --accent-light: #81d4fa;
+      --glass-bg: rgba(255,255,255,0.07);
+      --glass-border: rgba(255,255,255,0.12);
+      --text: #e8eaf6;
+      --text-muted: rgba(232,234,246,0.65);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(160deg, var(--bg-dark), var(--bg-mid));
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Layout ── */
+    #app {
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #text-col {
+      width: 40%;
+      height: 100vh;
+      overflow-y: auto;
+      position: relative;
+      z-index: 10;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent) transparent;
+    }
+
+    #map-col {
+      width: 60%;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ── Section ── */
+    .section {
+      min-height: 100vh;
+      padding: 60px 40px 60px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-bottom: 1px solid var(--glass-border);
+      transition: opacity 0.4s;
+    }
+
+    .section.dimmed { opacity: 0.35; }
+
+    .section-inner {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 36px 32px;
+      max-width: 560px;
+    }
+
+    .section-number {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+      opacity: 0.8;
+    }
+
+    h1 {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    h2 {
+      font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+      font-weight: 600;
+      line-height: 1.3;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--accent-light);
+      margin-bottom: 20px;
+      font-weight: 400;
+    }
+
+    p {
+      font-size: 0.9rem;
+      line-height: 1.75;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    p:last-child { margin-bottom: 0; }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 18px 0;
+    }
+
+    .pill {
+      border-radius: 999px;
+      background: rgba(79,195,247,0.15);
+      color: var(--accent);
+      border: 1px solid rgba(79,195,247,0.3);
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 4px 14px;
+    }
+
+    .stat-row {
+      display: flex;
+      gap: 16px;
+      margin: 18px 0;
+      flex-wrap: wrap;
+    }
+
+    .stat-box {
+      background: rgba(79,195,247,0.08);
+      border: 1px solid rgba(79,195,247,0.2);
+      border-radius: 10px;
+      padding: 12px 18px;
+      flex: 1;
+      min-width: 100px;
+    }
+
+    .stat-box .value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent);
+      display: block;
+    }
+
+    .stat-box .label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      display: block;
+    }
+
+    .formula-box {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      color: var(--accent-light);
+      margin: 14px 0;
+      text-align: center;
+    }
+
+    .info-list {
+      list-style: none;
+      margin: 14px 0;
+    }
+
+    .info-list li {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      padding: 7px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .info-list li:last-child { border-bottom: none; }
+
+    .info-list li span.tag {
+      color: var(--accent);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 18px 0;
+    }
+
+    .team-member {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .team-member strong {
+      display: block;
+      color: var(--text);
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    /* ── Map overlay ── */
+    #section-label {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(13,13,43,0.85);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(8px);
+      border-radius: 999px;
+      padding: 6px 18px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      z-index: 20;
+      pointer-events: none;
+      white-space: nowrap;
+      transition: opacity 0.3s;
+    }
+
+    #progress-dots {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 20;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    .dot.active {
+      background: var(--accent);
+      transform: scale(1.3);
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 768px) {
+      #app {
+        flex-direction: column;
+        height: auto;
+        overflow: visible;
+      }
+
+      #map-col {
+        width: 100%;
+        height: 50vh;
+        position: sticky;
+        top: 0;
+        z-index: 5;
+      }
+
+      #text-col {
+        width: 100%;
+        height: auto;
+        overflow-y: visible;
+      }
+
+      .section {
+        padding: 40px 20px;
+      }
+
+      .section-inner {
+        padding: 24px 20px;
+        max-width: 100%;
+      }
+
+      .team-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Scrollbar ── */
+    #text-col::-webkit-scrollbar { width: 4px; }
+    #text-col::-webkit-scrollbar-track { background: transparent; }
+    #text-col::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+  </style>
 </head>
 <body>
-  <h1>Hemsidan är under uppbyggnad</h1>
-  <p>Mer information kommer snart.</p>
+
+<div id="app">
+
+  <!-- ── Text column ── -->
+  <div id="text-col">
+
+    <!-- 1. Inledning -->
+    <section class="section" data-section="intro">
+      <div class="section-inner">
+        <div class="section-number">01 / Inledning</div>
+        <h1>Rullstolstillgänglighet i Uppsala innerstad</h1>
+        <p class="subtitle">En rumslig analys av framkomlighet</p>
+
+        <p>Hur tillgänglig är Uppsala innerstad för rullstolsanvändare? FN:s Agenda 2030, mål 11 <em>Hållbara städer och samhällen</em>, betonar behovet av inkluderande stadsplanering. I Uppsala pågår arbetet med en ny innerstadsstrategi — och paraplyföreningen <strong>Funktionsrätt Uppsala</strong> har lyft kritiska brister: problematiska markbeläggningar, hinder på gångvägar och bristande tillgänglighet längs Fyrisån.</p>
+
+        <p>Denna studie kartlägger och analyserar rullstolsframkomlighet i Uppsalas centrala delar genom GIS-analyser av väglutning, vägunderlag och optimala rutter.</p>
+
+        <div class="pill-row">
+          <span class="pill">FN:s mål 11.2</span>
+          <span class="pill">FN:s mål 11.7</span>
+          <span class="pill">GIS-analys</span>
+          <span class="pill">Uppsala innerstad</span>
+        </div>
+
+        <div class="team-grid">
+          <div class="team-member"><strong>Axel Edlund</strong>Kulturgeografiska inst.</div>
+          <div class="team-member"><strong>Isak Karlsson</strong>Kulturgeografiska inst.</div>
+          <div class="team-member"><strong>Simon Normelius</strong>Kulturgeografiska inst.</div>
+          <div class="team-member"><strong>Noel Wicksell</strong>Kulturgeografiska inst.</div>
+        </div>
+
+        <p style="font-size:0.78rem; color: rgba(232,234,246,0.4); margin-top:8px;">GIS 2 · Uppsala universitet · 2025</p>
+      </div>
+    </section>
+
+    <!-- 2. Väglutning -->
+    <section class="section dimmed" data-section="vaglutning">
+      <div class="section-inner">
+        <div class="section-number">02 / Metod</div>
+        <h2>Väglutning</h2>
+        <p class="subtitle">Road Slope Calculator · 50 m-segment</p>
+
+        <p>Gatans lutning är en av de viktigaste faktorerna för rullstolsframkomlighet. Analysen genomfördes med QGIS-tillägget <strong>Road Slope Calculator</strong>, som kombinerar Lantmäteriets höjdmodell (1 m upplösning) med vägnätverket från Trafikverket och OpenStreetMap.</p>
+
+        <div class="formula-box">Lutning (%) = (ΔZ / Δd) × 100</div>
+
+        <p>Vägnätverket delades upp i <strong>50 m-segment</strong> för tillräcklig detaljeringsgrad. Maxgränsen för tillgänglig väglutning sattes till <strong>4 %</strong>, i enlighet med Beale et al. (2013).</p>
+
+        <div class="stat-row">
+          <div class="stat-box">
+            <span class="value">4 %</span>
+            <span class="label">Max tillgänglig lutning</span>
+          </div>
+          <div class="stat-box">
+            <span class="value">50 m</span>
+            <span class="label">Segmentlängd</span>
+          </div>
+          <div class="stat-box">
+            <span class="value">1 m</span>
+            <span class="label">DEM-upplösning</span>
+          </div>
+        </div>
+
+        <p>Beale et al. (2013) identifierar 4 % som den kritiska gränsen — ett gatusegment med lutning över detta innebär svår eller omöjlig framkomlighet utan assistans.</p>
+
+        <!-- TODO: Lägg till GeoJSON-lager här för sektion "vaglutning" -->
+        <!-- TODO: Lägg till legend för väglutning -->
+      </div>
+    </section>
+
+    <!-- 3. Vägunderlag -->
+    <section class="section dimmed" data-section="vagunderlag">
+      <div class="section-inner">
+        <div class="section-number">03 / Metod</div>
+        <h2>Vägunderlag</h2>
+        <p class="subtitle">Silver Ways-data + manuell komplettering</p>
+
+        <p>Vägunderlagets typ påverkar kraftigt framkomligheten i rullstol. Data för markbeläggning hämtades från <strong>Silver Ways</strong> (Jan Amcoff, Uppsala universitet) och kompletterades manuellt med hjälp av <strong>Google Street View</strong>.</p>
+
+        <p>Ytorna klassificerades och viktades efter friktionskoefficient — hårdare och jämnare underlag ger lägre kostnadsvärde:</p>
+
+        <ul class="info-list">
+          <li><span>Asfalt</span><span class="tag">Kostnad: 1</span></li>
+          <li><span>Betongplattor</span><span class="tag">Kostnad: 3</span></li>
+          <li><span>Trä / Brygga</span><span class="tag">Kostnad: 1</span></li>
+          <li><span>Gatsten / Kullerstensgata</span><span class="tag">Kostnad: 7</span></li>
+          <li><span>Grus / Gräs</span><span class="tag">Kostnad: 10</span></li>
+        </ul>
+
+        <p>Gatsten dominerar många historiska gator i centrum och utgör ett av de största hindren för rullstolsframkomlighet i Uppsala innerstad.</p>
+
+        <!-- TODO: Lägg till GeoJSON-lager här för sektion "vagunderlag" -->
+      </div>
+    </section>
+
+    <!-- 4. Least Cost Path -->
+    <section class="section dimmed" data-section="lcp">
+      <div class="section-inner">
+        <div class="section-number">04 / Analys</div>
+        <h2>Least Cost Path</h2>
+        <p class="subtitle">Multikriterieanalys: lutning + underlag</p>
+
+        <p>En <strong>Least Cost Path (LCP)</strong>-analys identifierar den rutt med lägst samlad kostnad mellan två punkter — inte nödvändigtvis den kortaste sträckan, utan den mest framkomliga.</p>
+
+        <p>Kostnadsytan skapades genom reklassificering av väglutning och vägunderlag:</p>
+
+        <ul class="info-list">
+          <li><span>Lutning 0–2 %</span><span class="tag">Kostnad: 1</span></li>
+          <li><span>Lutning 2–4 %</span><span class="tag">Kostnad: 5</span></li>
+          <li><span>Lutning &gt; 4 %</span><span class="tag">Kostnad: 1 000</span></li>
+        </ul>
+
+        <p>Destinationer analyserades från Uppsala centralstation:</p>
+
+        <div class="pill-row">
+          <span class="pill">Carolina Rediviva</span>
+          <span class="pill">Domkyrkan</span>
+          <span class="pill">Stadsparken</span>
+          <span class="pill">Vaksala torg</span>
+        </div>
+
+        <p>LCP-rutterna visas på kartan och jämförs med kortaste-väg-rutterna. Avvikelserna belyser var de faktiska hindren finns.</p>
+
+        <!-- TODO: Lägg till GeoJSON-lager för LCP-rutter och kortaste vägar -->
+      </div>
+    </section>
+
+    <!-- 5. Anläggningsanalys -->
+    <section class="section dimmed" data-section="anlaggning">
+      <div class="section-inner">
+        <div class="section-number">05 / Analys</div>
+        <h2>Anläggningsanalys</h2>
+        <p class="subtitle">Wheelmap / OSM · Kernel Density</p>
+
+        <p>Utöver gatunätverket analyserades enskilda platser och anläggningar med avseende på tillgänglighet. Data hämtades från <strong>Wheelmap</strong> och <strong>OpenStreetMap</strong> via wheelchair-taggen.</p>
+
+        <ul class="info-list">
+          <li><span>wheelchair=yes</span><span class="tag" style="color:#4caf50;">Tillgänglig</span></li>
+          <li><span>wheelchair=limited</span><span class="tag" style="color:#ff9800;">Begränsad</span></li>
+          <li><span>wheelchair=no</span><span class="tag" style="color:#ef5350;">Otillgänglig</span></li>
+        </ul>
+
+        <p>Kernel Density-analys (KDE) användes för att identifiera koncentrationer av tillgängliga respektive otillgängliga platser — ett heatmap-perspektiv på var tillgängligheten är som bäst och sämst.</p>
+
+        <!-- TODO: Lägg till popups för POI-punkter -->
+        <!-- TODO: Lägg till KDE-lager som raster overlay -->
+      </div>
+    </section>
+
+    <!-- 6. Sammanfattning -->
+    <section class="section dimmed" data-section="sammanfattning">
+      <div class="section-inner">
+        <div class="section-number">06 / Slutsats</div>
+        <h2>Sammanfattning &amp; diskussion</h2>
+        <p class="subtitle">Vad visar analyserna — och vad saknas?</p>
+
+        <p>Analyserna visar att Uppsala innerstad har stora variationer i tillgänglighet för rullstolsanvändare. Historiska gatumiljöer med gatsten och kuperade partier nära slottsbacken utgör de tydligaste hindren.</p>
+
+        <p>LCP-rutterna avviker markant från de kortaste vägarna i flera fall, vilket visar att optimal framkomlighet kräver omvägar för att undvika branta eller ojämna partier.</p>
+
+        <p><strong>Kunskapsluckor i studien:</strong></p>
+
+        <ul class="info-list">
+          <li><span>Vägbredd</span><span class="tag" style="color:#ff9800;">Saknas i data</span></li>
+          <li><span>Trottoarkanter / kantstöd</span><span class="tag" style="color:#ff9800;">Saknas i data</span></li>
+          <li><span>Barriärer (stolpar, pollare)</span><span class="tag" style="color:#ff9800;">Saknas i data</span></li>
+          <li><span>Övergångsställens utformning</span><span class="tag" style="color:#ff9800;">Saknas i data</span></li>
+        </ul>
+
+        <p>För mer nyanserade analyser krävs bättre och mer detaljerade data. Studien visar att GIS-verktyg har stor potential för tillgänglighetsanalys — men är beroende av datakvalitet.</p>
+
+        <div class="pill-row">
+          <span class="pill">Lantmäteriet DEM</span>
+          <span class="pill">Trafikverket Lastkajen</span>
+          <span class="pill">Silver Ways / J. Amcoff</span>
+          <span class="pill">Wheelmap / OSM</span>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /text-col -->
+
+  <!-- ── Map column ── -->
+  <div id="map-col">
+    <div id="map"></div>
+    <div id="section-label">Överblick — Uppsala innerstad</div>
+    <div id="progress-dots">
+      <div class="dot active" data-index="0"></div>
+      <div class="dot" data-index="1"></div>
+      <div class="dot" data-index="2"></div>
+      <div class="dot" data-index="3"></div>
+      <div class="dot" data-index="4"></div>
+      <div class="dot" data-index="5"></div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+  // ── Map setup — MapLibre GL JS (no token required) ──
+  const map = new maplibregl.Map({
+    container: 'map',
+    style: {
+      version: 8,
+      sources: {
+        'carto-dark': {
+          type: 'raster',
+          tiles: [
+            'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+            'https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+            'https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png'
+          ],
+          tileSize: 256,
+          attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }
+      },
+      layers: [{
+        id: 'carto-dark-layer',
+        type: 'raster',
+        source: 'carto-dark',
+        minzoom: 0,
+        maxzoom: 22
+      }],
+      glyphs: 'https://fonts.openmaptiles.org/{fontstack}/{range}.pbf'
+    },
+    center: [17.638, 59.858],
+    zoom: 13,
+    pitch: 0,
+    bearing: 0
+  });
+
+  // Disable scroll zoom — page scroll should control scrollytelling
+  map.scrollZoom.disable();
+  map.addControl(new maplibregl.NavigationControl({ showCompass: true }), 'top-right');
+
+  // ── Section fly-to configs ──
+  const sectionConfigs = {
+    intro:          { center: [17.638, 59.858], zoom: 13,   pitch: 0,  bearing: 0,   duration: 2000 },
+    vaglutning:     { center: [17.640, 59.860], zoom: 14,   pitch: 30, bearing: -10, duration: 2000 },
+    vagunderlag:    { center: [17.635, 59.856], zoom: 14.5, pitch: 20, bearing: 10,  duration: 2000 },
+    lcp:            { center: [17.638, 59.858], zoom: 14,   pitch: 45, bearing: -20, duration: 2000 },
+    anlaggning:     { center: [17.638, 59.858], zoom: 13.5, pitch: 10, bearing: 0,   duration: 2000 },
+    sammanfattning: { center: [17.638, 59.858], zoom: 12.5, pitch: 0,  bearing: 0,   duration: 2000 }
+  };
+
+  const sectionLabels = {
+    intro:          'Överblick — Uppsala innerstad',
+    vaglutning:     'Analys — Väglutning',
+    vagunderlag:    'Analys — Vägunderlag',
+    lcp:            'Analys — Least Cost Path',
+    anlaggning:     'Analys — Anläggningar & POI',
+    sammanfattning: 'Sammanfattning'
+  };
+
+  const sectionOrder = ['intro', 'vaglutning', 'vagunderlag', 'lcp', 'anlaggning', 'sammanfattning'];
+
+  // ── Layer visibility per section ──
+  const sectionLayers = {
+    intro:          [],
+    vaglutning:     [],
+    vagunderlag:    ['amcoff-layer'],
+    lcp:            ['lcp-carolina-layer', 'lcp-domkyrkan-layer', 'lcp-stadsparken-layer', 'lcp-vaksala-layer',
+                     'shortest-carolina-layer', 'shortest-vt-layer'],
+    anlaggning:     ['poi-new-layer', 'poi-stora-torget-layer'],
+    sammanfattning: ['lcp-carolina-layer', 'lcp-domkyrkan-layer', 'poi-new-layer']
+  };
+
+  const ALL_LAYERS = [
+    'lcp-carolina-layer', 'lcp-domkyrkan-layer', 'lcp-stadsparken-layer', 'lcp-vaksala-layer',
+    'amcoff-layer', 'shortest-carolina-layer', 'shortest-vt-layer',
+    'poi-new-layer', 'poi-stora-torget-layer'
+  ];
+
+  function setVisibleLayers(activeSection) {
+    const activeLayers = sectionLayers[activeSection] || [];
+    ALL_LAYERS.forEach(id => {
+      if (map.getLayer(id)) {
+        map.setLayoutProperty(id, 'visibility', activeLayers.includes(id) ? 'visible' : 'none');
+      }
+    });
+  }
+
+  // ── Load GeoJSON layers after map style loads ──
+  map.on('load', () => {
+
+    // LCP routes
+    const lcpFiles = [
+      { id: 'lcp-carolina',    file: 'data/lcp_carolina.geojson',    color: '#4fc3f7' },
+      { id: 'lcp-domkyrkan',   file: 'data/lcp_domkyrkan.geojson',   color: '#81d4fa' },
+      { id: 'lcp-stadsparken', file: 'data/lcp_stadsparken.geojson', color: '#b3e5fc' },
+      { id: 'lcp-vaksala',     file: 'data/lcp_vaksala.geojson',     color: '#29b6f6' }
+    ];
+
+    lcpFiles.forEach(({ id, file, color }) => {
+      map.addSource(id, { type: 'geojson', data: file });
+      map.addLayer({
+        id: id + '-layer',
+        type: 'line',
+        source: id,
+        layout: { 'line-join': 'round', 'line-cap': 'round', visibility: 'none' },
+        paint: { 'line-color': color, 'line-width': 3, 'line-opacity': 0.85 }
+      });
+    });
+
+    // Amcoff surface lines
+    map.addSource('amcoff', { type: 'geojson', data: 'data/amcoff_shortest_lines.geojson' });
+    map.addLayer({
+      id: 'amcoff-layer',
+      type: 'line',
+      source: 'amcoff',
+      layout: { 'line-join': 'round', visibility: 'none' },
+      paint: { 'line-color': '#ff8a65', 'line-width': 2, 'line-dasharray': [4, 2], 'line-opacity': 0.7 }
+    });
+
+    // Shortest path comparison routes
+    const shortFiles = [
+      { id: 'shortest-carolina', file: 'data/shortest_st_carolina.geojson', color: '#ef9a9a' },
+      { id: 'shortest-vt',       file: 'data/shortest_st_vt.geojson',       color: '#f48fb1' }
+    ];
+
+    shortFiles.forEach(({ id, file, color }) => {
+      map.addSource(id, { type: 'geojson', data: file });
+      map.addLayer({
+        id: id + '-layer',
+        type: 'line',
+        source: id,
+        layout: { 'line-join': 'round', visibility: 'none' },
+        paint: { 'line-color': color, 'line-width': 2, 'line-dasharray': [3, 3], 'line-opacity': 0.7 }
+      });
+    });
+
+    // POI — general
+    map.addSource('poi-new', { type: 'geojson', data: 'data/poi_new.geojson' });
+    map.addLayer({
+      id: 'poi-new-layer',
+      type: 'circle',
+      source: 'poi-new',
+      layout: { visibility: 'none' },
+      paint: {
+        'circle-radius': 6,
+        'circle-color': ['match', ['get', 'wheelchair'],
+          'yes',     '#4caf50',
+          'limited', '#ff9800',
+          'no',      '#ef5350',
+          '#4fc3f7'
+        ],
+        'circle-stroke-color': 'rgba(255,255,255,0.4)',
+        'circle-stroke-width': 1.5,
+        'circle-opacity': 0.9
+      }
+    });
+
+    // POI — Stora Torget
+    map.addSource('poi-stora-torget', { type: 'geojson', data: 'data/poi_stora_torget.geojson' });
+    map.addLayer({
+      id: 'poi-stora-torget-layer',
+      type: 'circle',
+      source: 'poi-stora-torget',
+      layout: { visibility: 'none' },
+      paint: {
+        'circle-radius': 7,
+        'circle-color': '#4fc3f7',
+        'circle-stroke-color': 'rgba(255,255,255,0.5)',
+        'circle-stroke-width': 2,
+        'circle-opacity': 0.95
+      }
+    });
+
+    // TODO: Lägg till popups för POI-punkter
+    // TODO: Lägg till legend för väglutning
+    // TODO: Lägg till KDE raster-lager som overlay
+  });
+
+  // ── IntersectionObserver (scrollytelling) ──
+  let activeSection = 'intro';
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const section = entry.target.dataset.section;
+      if (section === activeSection) return;
+      activeSection = section;
+
+      // Fly map to section view
+      if (sectionConfigs[section]) {
+        map.flyTo(sectionConfigs[section]);
+      }
+
+      // Update top label
+      const labelEl = document.getElementById('section-label');
+      if (labelEl) labelEl.textContent = sectionLabels[section] || '';
+
+      // Update progress dots
+      const idx = sectionOrder.indexOf(section);
+      document.querySelectorAll('.dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i === idx);
+      });
+
+      // Dim inactive sections
+      document.querySelectorAll('[data-section]').forEach(s => {
+        s.classList.toggle('dimmed', s.dataset.section !== section);
+      });
+
+      // Show/hide layers
+      if (map.isStyleLoaded()) {
+        setVisibleLayers(section);
+      }
+    });
+  }, { threshold: 0.4 });
+
+  document.querySelectorAll('[data-section]').forEach(s => observer.observe(s));
+</script>
+
 </body>
 </html>
