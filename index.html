@@ -895,6 +895,11 @@
       p.classList.toggle('active', p.dataset.panel === dest));
     transitionToSection(key);
     renderLegend(key);
+    const v = SECTION_VIEWS[key];
+    if (v) {
+      const padding = window.innerWidth <= 900 ? 6 : v.padding;
+      map.fitBounds(v.bounds, { padding, duration: v.duration, pitch: v.pitch, bearing: v.bearing });
+    }
     const labelEl = document.getElementById('section-label');
     labelEl.style.opacity = '0';
     setTimeout(() => { labelEl.textContent = SECTION_LABELS[key] || ''; labelEl.style.opacity = '1'; }, 200);
@@ -1005,6 +1010,22 @@
     handleSwipe(touchStartY - e.changedTouches[0].clientY);
   }, { passive: true });
 
+  // Blockera CSS snap-scroll under LCP/anläggnings-sublagerscykling
+  textCol.addEventListener('touchmove', e => {
+    const forward = (touchStartY - e.touches[0].clientY) > 0;
+    if (activeSection === 'lcp') {
+      const idx = LCP_DESTS.indexOf(activeLcpDest);
+      if ((forward && idx < LCP_DESTS.length - 1) || (!forward && idx > 0)) {
+        e.preventDefault();
+      }
+    } else if (activeSection === 'anlaggning') {
+      const idx = ANL_LAYERS.indexOf(activeAnlLayer);
+      if ((forward && idx < ANL_LAYERS.length - 1) || (!forward && idx > 0)) {
+        e.preventDefault();
+      }
+    }
+  }, { passive: false });
+
   // ── Swipe hint (mobil, visas bara vid första besök) ──
   (function() {
     const hint = document.getElementById('swipe-hint');
@@ -1073,11 +1094,15 @@
   // ── Section configs ──
   // bounds: [[west, south], [east, north]] — fitBounds calculates zoom automatically per viewport size
   const SECTION_VIEWS = {
-    intro:       { bounds: [[17.614, 59.847], [17.662, 59.869]], padding: 32, pitch: 0, bearing: 0, duration: 2000 },
-    vaglutning:  { bounds: [[17.616, 59.847], [17.660, 59.869]], padding: 32, pitch: 0, bearing: 0, duration: 2000 },
-    vagunderlag: { bounds: [[17.616, 59.847], [17.660, 59.869]], padding: 32, pitch: 0, bearing: 0, duration: 2000 },
-    lcp:         { bounds: [[17.614, 59.847], [17.662, 59.869]], padding: 32, pitch: 0, bearing: 0, duration: 2000 },
-    anlaggning:  { bounds: [[17.617, 59.849], [17.657, 59.869]], padding: 32, pitch: 0, bearing: 0, duration: 2000 }
+    intro:             { bounds: [[17.614, 59.847], [17.662, 59.869]], padding: 32, pitch: 0, bearing: 0, duration: 2000 },
+    vaglutning:        { bounds: [[17.616, 59.847], [17.660, 59.869]], padding: 32, pitch: 0, bearing: 0, duration: 2000 },
+    vagunderlag:       { bounds: [[17.616, 59.847], [17.660, 59.869]], padding: 32, pitch: 0, bearing: 0, duration: 2000 },
+    lcp:               { bounds: [[17.614, 59.847], [17.662, 59.869]], padding: 32, pitch: 0, bearing: 0, duration: 2000 },
+    'lcp-carolina':    { bounds: [[17.6214, 59.8542], [17.6422, 59.8625]], padding: 48, pitch: 0, bearing: 0, duration: 1200 },
+    'lcp-domkyrkan':   { bounds: [[17.6309, 59.8575], [17.6400, 59.8589]], padding: 48, pitch: 0, bearing: 0, duration: 1200 },
+    'lcp-stadsparken': { bounds: [[17.6367, 59.8515], [17.6432, 59.8595]], padding: 48, pitch: 0, bearing: 0, duration: 1200 },
+    'lcp-vaksala':     { bounds: [[17.6376, 59.8578], [17.6483, 59.8632]], padding: 48, pitch: 0, bearing: 0, duration: 1200 },
+    anlaggning:        { bounds: [[17.617, 59.849], [17.657, 59.869]], padding: 32, pitch: 0, bearing: 0, duration: 2000 }
   };
 
   const SECTION_LABELS = {
@@ -1470,6 +1495,10 @@
     const introView = SECTION_VIEWS['intro'];
     const initPadding = window.innerWidth <= 900 ? 6 : introView.padding;
     map.fitBounds(introView.bounds, { padding: initPadding, pitch: introView.pitch, bearing: introView.bearing, duration: 0 });
+
+    // Ensure initial layers are shown (IntersectionObserver skips the already-active section)
+    transitionToSection('intro');
+    renderLegend('intro');
 
     Object.keys(LCP_DEST).forEach(id => {
       map.on('click', id, e => {
