@@ -109,7 +109,8 @@
 
     /* ── Section ── */
     .section {
-      min-height: 100vh;
+      height: 100%;
+      flex-shrink: 0;
       display: flex;
       flex-direction: column;
       border-bottom: 1px solid rgba(26,39,68,0.12);
@@ -144,6 +145,7 @@
     .section-body {
       padding: 22px 40px 56px 40px;
       flex: 1;
+      overflow-y: auto;
     }
 
     .section-number {
@@ -531,8 +533,7 @@
       #sidebar { width: 100%; height: auto; flex: 3; min-height: 0; }
       #map-col { height: auto; flex: 2; min-height: 0; }
       #progress-nav { display: none; }
-      #text-col { scroll-snap-type: none; overflow: hidden; }
-      .section { min-height: 100%; scroll-snap-align: none; }
+      #text-col { scroll-snap-type: y mandatory; overflow-y: scroll; }
 
       .sidebar-header { padding: 5px 14px; }
       .sidebar-header h1 { font-size: 0.95rem; }
@@ -937,13 +938,7 @@
 
   function scrollToSection(key) {
     const el = document.querySelector('[data-section="' + key + '"]');
-    if (!el) return;
-    if (window.innerWidth <= 900) {
-      textCol.scrollTop = el.offsetTop - textCol.offsetTop;
-      activateSection(key);
-    } else {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function navigateSection(forward) {
@@ -1548,7 +1543,7 @@
           renderLegend(section);
         }
       });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.5 });
 
     document.querySelectorAll('[data-section]').forEach(s => observer.observe(s));
 
