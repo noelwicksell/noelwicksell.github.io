@@ -54,6 +54,8 @@
       z-index: 10;
       scrollbar-width: thin;
       scrollbar-color: var(--accent) transparent;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
     }
 
     #map-col {
@@ -75,6 +77,8 @@
       flex-direction: column;
       border-bottom: 1px solid var(--glass-border);
       transition: opacity 0.5s ease;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
     }
 
     .section.dimmed { opacity: 0.3; }
@@ -409,7 +413,8 @@
         flex-shrink: 0;
       }
 
-      .section { min-height: auto; }
+      .section { min-height: auto; scroll-snap-align: none; }
+      #text-col { scroll-snap-type: none; }
 
       .section-header {
         padding: 28px 20px 16px 20px;
