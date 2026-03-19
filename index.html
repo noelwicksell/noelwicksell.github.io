@@ -431,6 +431,8 @@
     .legend-swatch-gradient { width: 60px; height: 13px; border-radius: 6px; flex-shrink: 0; box-shadow: 0 0 0 1px rgba(0,0,0,0.12); }
 
     /* Popup */
+    .maplibregl-ctrl-logo { display: none !important; }
+
     .maplibregl-popup.map-popup .maplibregl-popup-content {
       background: white;
       border-radius: 10px;
@@ -864,7 +866,8 @@
     center: [17.638, 59.858],
     zoom: 13,
     pitch: 0,
-    bearing: 0
+    bearing: 0,
+    attributionControl: false
   });
 
   map.scrollZoom.disable();
