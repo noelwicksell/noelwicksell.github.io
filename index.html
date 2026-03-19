@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="En rumslig GIS-analys av rullstolsframkomlighet i Uppsala innerstad — väglutning, vägunderlag och Least Cost Path. Uppsala universitet, GIS 2, 2025." />
+  <meta name="theme-color" content="#a8c8dc" />
   <title>Rullstolstillgänglighet i Uppsala innerstad</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -72,10 +74,22 @@
       flex-direction: column;
       justify-content: center;
       border-bottom: 1px solid var(--glass-border);
-      transition: opacity 0.4s;
+      transition: opacity 0.5s ease;
     }
 
-    .section.dimmed { opacity: 0.35; }
+    .section.dimmed { opacity: 0.3; }
+
+    .section-inner {
+      transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .section.dimmed .section-inner {
+      transform: translateY(10px);
+    }
+
+    .section:not(.dimmed) .section-inner {
+      transform: translateY(0);
+    }
 
     .section-inner {
       background: var(--glass-bg);
@@ -251,30 +265,116 @@
       z-index: 20;
       pointer-events: none;
       white-space: nowrap;
-      transition: opacity 0.3s;
+      transition: opacity 0.25s ease;
     }
 
-    #progress-dots {
-      position: absolute;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
+    /* ── Progress indicator (vertikal, vänster i text-kolumnen) ── */
+    #progress-nav {
+      position: fixed;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
       display: flex;
-      gap: 8px;
-      z-index: 20;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 30;
     }
 
-    .dot {
+    .progress-dot {
+      position: relative;
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: rgba(26,39,68,0.25);
-      transition: background 0.3s, transform 0.3s;
+      background: rgba(26,39,68,0.22);
+      border: 1.5px solid rgba(26,39,68,0.3);
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s, border-color 0.3s;
     }
 
-    .dot.active {
+    .progress-dot.active {
       background: var(--navy);
-      transform: scale(1.3);
+      border-color: var(--navy);
+      transform: scale(1.4);
+    }
+
+    .progress-dot:hover {
+      background: var(--teal);
+      border-color: var(--teal);
+    }
+
+    .progress-dot .dot-label {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--navy);
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 600;
+      white-space: nowrap;
+      padding: 3px 8px;
+      border-radius: 4px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .progress-dot:hover .dot-label,
+    .progress-dot.active .dot-label {
+      opacity: 1;
+    }
+
+    /* Gamla prickar på kartan — behålls men döljs */
+    #progress-dots { display: none; }
+
+    /* ── Footer ── */
+    .site-footer {
+      background: var(--navy);
+      color: rgba(255,255,255,0.85);
+      padding: 36px 48px 48px;
+      font-size: 0.82rem;
+      line-height: 1.7;
+    }
+
+    .site-footer h3 {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--teal);
+      margin-bottom: 10px;
+    }
+
+    .site-footer a {
+      color: var(--teal);
+      text-decoration: none;
+    }
+
+    .site-footer a:hover { text-decoration: underline; }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .footer-bottom {
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.45);
+    }
+
+    /* ── Flik fokus (tangentbord) ── */
+    .lcp-tab-btn:focus-visible {
+      outline: 2px solid var(--navy);
+      outline-offset: 2px;
     }
 
     /* ── Mobile ── */
@@ -309,6 +409,21 @@
       }
 
       .team-grid { grid-template-columns: 1fr; }
+
+      #progress-nav { display: none; }
+
+      #legend {
+        bottom: 8px;
+        right: 8px;
+        left: 8px;
+        min-width: unset;
+        max-width: unset;
+        font-size: 0.72rem;
+      }
+
+      .footer-grid { grid-template-columns: 1fr; }
+
+      .site-footer { padding: 28px 20px 36px; }
     }
 
     /* ── Scrollbar ── */
@@ -459,10 +574,20 @@
 </head>
 <body>
 
+<!-- Vertikal progress-indikator -->
+<nav id="progress-nav" aria-label="Sidnavigering">
+  <button class="progress-dot active" data-target="intro"          aria-label="Gå till Inledning"><span class="dot-label">Inledning</span></button>
+  <button class="progress-dot"        data-target="vaglutning"     aria-label="Gå till Väglutning"><span class="dot-label">Väglutning</span></button>
+  <button class="progress-dot"        data-target="vagunderlag"    aria-label="Gå till Vägunderlag"><span class="dot-label">Vägunderlag</span></button>
+  <button class="progress-dot"        data-target="lcp"            aria-label="Gå till Least Cost Path"><span class="dot-label">Least Cost Path</span></button>
+  <button class="progress-dot"        data-target="anlaggning"     aria-label="Gå till Anläggningsanalys"><span class="dot-label">Anläggningsanalys</span></button>
+  <button class="progress-dot"        data-target="sammanfattning" aria-label="Gå till Sammanfattning"><span class="dot-label">Sammanfattning</span></button>
+</nav>
+
 <div id="app">
 
   <!-- ── Text column ── -->
-  <div id="text-col">
+  <div id="text-col" role="main">
 
     <!-- 1. Inledning -->
     <section class="section" data-section="intro">
@@ -563,15 +688,15 @@
         <p>En <strong>Least Cost Path (LCP)</strong>-analys identifierar den rutt med lägst samlad kostnad — inte den kortaste sträckan, utan den mest framkomliga för rullstol. Välj en destination för att jämföra LCP mot kortaste väg.</p>
 
         <!-- Tab-knappar -->
-        <div class="lcp-tabs">
-          <button class="lcp-tab-btn active" data-tab="carolina"    style="--tab-color:#1a2744">Carolina<br>Rediviva</button>
-          <button class="lcp-tab-btn"         data-tab="domkyrkan"  style="--tab-color:#c0392b">Dom-<br>kyrkan</button>
-          <button class="lcp-tab-btn"         data-tab="stadsparken"style="--tab-color:#27ae60">Stads-<br>parken</button>
-          <button class="lcp-tab-btn"         data-tab="vaksala"    style="--tab-color:#5bb5c4">Vaksala<br>torg</button>
+        <div class="lcp-tabs" role="tablist" aria-label="LCP-destinationer">
+          <button class="lcp-tab-btn active" role="tab" aria-selected="true"  aria-controls="lcp-panel-carolina"    data-tab="carolina"    style="--tab-color:#1a2744">Carolina<br>Rediviva</button>
+          <button class="lcp-tab-btn"        role="tab" aria-selected="false" aria-controls="lcp-panel-domkyrkan"   data-tab="domkyrkan"   style="--tab-color:#c0392b">Dom-<br>kyrkan</button>
+          <button class="lcp-tab-btn"        role="tab" aria-selected="false" aria-controls="lcp-panel-stadsparken" data-tab="stadsparken" style="--tab-color:#27ae60">Stads-<br>parken</button>
+          <button class="lcp-tab-btn"        role="tab" aria-selected="false" aria-controls="lcp-panel-vaksala"     data-tab="vaksala"     style="--tab-color:#5bb5c4">Vaksala<br>torg</button>
         </div>
 
         <!-- ── Carolina Rediviva ── -->
-        <div class="lcp-tab-panel active" id="lcp-panel-carolina">
+        <div class="lcp-tab-panel active" id="lcp-panel-carolina" role="tabpanel" aria-labelledby="lcp-tab-carolina">
           <h2 style="color:#1a2744;margin-bottom:6px">Carolina Rediviva</h2>
           <p class="subtitle">Centralstationen → Carolina Rediviva</p>
           <div class="stat-row">
@@ -685,8 +810,9 @@
   </div><!-- /text-col -->
 
   <!-- ── Map column ── -->
+
   <div id="map-col">
-    <div id="map"></div>
+    <div id="map" role="application" aria-label="Interaktiv karta över Uppsala innerstad — visar tillgänglighetsanalyser för rullstolsanvändare"></div>
     <div id="section-label">Överblick — Uppsala innerstad</div>
     <div id="legend"></div>
     <div id="progress-dots">
@@ -700,6 +826,33 @@
   </div>
 
 </div><!-- /app -->
+
+<!-- ── Footer ── -->
+<footer class="site-footer" role="contentinfo">
+  <div class="footer-grid">
+    <div>
+      <h3>Grupp 4</h3>
+      <p style="color:rgba(255,255,255,0.85);margin:0">
+        Axel Edlund<br>
+        Isak Karlsson<br>
+        Simon Normelius<br>
+        Noel Wicksell
+      </p>
+    </div>
+    <div>
+      <h3>Kurs &amp; institution</h3>
+      <p style="color:rgba(255,255,255,0.85);margin:0">
+        GIS 2 · Uppsala universitet<br>
+        Kulturgeografiska institutionen<br>
+        Vårterminen 2025
+      </p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Grupp 4 · Uppsala universitet</span>
+    <span>Data: Lantmäteriet · Trafikverket · Silver Ways · Wheelmap / OSM</span>
+  </div>
+</footer>
 
 <script>
   // ── Map setup ──
@@ -1038,9 +1191,11 @@
     activeLcpTab = tabId;
     const tab = LCP_TABS[tabId];
 
-    // Update tab button UI
+    // Update tab button UI + aria
     document.querySelectorAll('.lcp-tab-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.tab === tabId);
+      const isActive = btn.dataset.tab === tabId;
+      btn.classList.toggle('active', isActive);
+      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
     });
 
     // Update tab panel UI
@@ -1187,6 +1342,22 @@
     'lcp-vaksala':     'Vaksala torg'
   };
 
+  // ── Progress-nav: klick scrollar till sektion ──
+  document.getElementById('progress-nav').addEventListener('click', e => {
+    const dot = e.target.closest('.progress-dot');
+    if (!dot) return;
+    const target = dot.dataset.target;
+    const el = document.querySelector('[data-section="' + target + '"]');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Hjälpfunktion: uppdatera progress-nav prickar
+  function updateProgressNav(section) {
+    document.querySelectorAll('.progress-dot').forEach(dot => {
+      dot.classList.toggle('active', dot.dataset.target === section);
+    });
+  }
+
   // ── Tab button click (event delegation on the text column) ──
   document.getElementById('text-col').addEventListener('click', e => {
     const btn = e.target.closest('.lcp-tab-btn');
@@ -1195,11 +1366,25 @@
     if (tabId && tabId !== activeLcpTab && activeSection === 'lcp') {
       switchLcpTab(tabId);
     } else if (tabId && tabId !== activeLcpTab) {
-      // Update UI even if section not active yet
       activeLcpTab = tabId;
-      document.querySelectorAll('.lcp-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
+      document.querySelectorAll('.lcp-tab-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.tab === tabId);
+        b.setAttribute('aria-selected', b.dataset.tab === tabId ? 'true' : 'false');
+      });
       document.querySelectorAll('.lcp-tab-panel').forEach(p => p.classList.toggle('active', p.id === 'lcp-panel-' + tabId));
     }
+  });
+
+  // ── Tangentbordsnavigation för LCP-flikar (piltangenter) ──
+  document.getElementById('text-col').addEventListener('keydown', e => {
+    const btn = e.target.closest('.lcp-tab-btn');
+    if (!btn) return;
+    const tabs = [...document.querySelectorAll('.lcp-tab-btn')];
+    const idx  = tabs.indexOf(btn);
+    let next = -1;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown')  next = (idx + 1) % tabs.length;
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')    next = (idx - 1 + tabs.length) % tabs.length;
+    if (next >= 0) { e.preventDefault(); tabs[next].focus(); tabs[next].click(); }
   });
 
   map.on('load', () => {
@@ -1252,10 +1437,14 @@
 
         map.flyTo(SECTION_VIEWS[section]);
 
-        document.getElementById('section-label').textContent = SECTION_LABELS[section] || '';
+        const labelEl = document.getElementById('section-label');
+        labelEl.style.opacity = '0';
+        setTimeout(() => {
+          labelEl.textContent = SECTION_LABELS[section] || '';
+          labelEl.style.opacity = '1';
+        }, 200);
 
-        const idx = SECTION_ORDER.indexOf(section);
-        document.querySelectorAll('.dot').forEach((dot, i) => dot.classList.toggle('active', i === idx));
+        updateProgressNav(section);
 
         document.querySelectorAll('[data-section]').forEach(s => {
           s.classList.toggle('dimmed', s.dataset.section !== section);
