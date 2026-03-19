@@ -978,6 +978,40 @@
       layout: { 'line-join': 'round', visibility: 'none' }
     },
 
+    // ── Amcoff vägunderlag (surface-färgkodning) — delar källa med amcoff ──
+    {
+      id: 'amcoff-surface', sourceId: 'amcoff', file: 'data/amcoff_surface.geojson',
+      type: 'line',
+      paint: {
+        'line-color': ['match', ['get', 'surface'],
+          'a',    '#27ae60',   // asfalt — grön
+          'bp',   '#3498db',   // betongplattor — blå
+          'wood', '#8e44ad',   // trä — lila
+          'gs',   '#e67e22',   // gatsten — orange
+          'g',    '#c0392b',   // grus — röd
+          '#95a5a6'            // null/okänd — grå
+        ],
+        'line-width': 2.5,
+        'line-opacity': 0,
+        'line-opacity-transition': { duration: 400, delay: 0 }
+      },
+      layout: { 'line-join': 'round', visibility: 'none' }
+    },
+
+    // ── Uppsala innerstad — gräns (visas i alla sektioner) ──
+    {
+      id: 'innerstad', sourceId: 'innerstad', file: 'data/uppsala_innerstad.geojson',
+      type: 'line',
+      paint: {
+        'line-color': '#1a2744',
+        'line-width': 2,
+        'line-dasharray': [5, 3],
+        'line-opacity': 0,
+        'line-opacity-transition': { duration: 400, delay: 0 }
+      },
+      layout: { 'line-join': 'round', visibility: 'none' }
+    },
+
     // ── POI cirklar ──
     // NOTE: poi_new.geojson har endast attributet "Namn" — saknar wheelchair=yes/limited/no.
     // TODO: Lägg till wheelchair-attribut i GeoJSON för färgkodning av tillgänglighet.
@@ -1000,7 +1034,7 @@
 
     // ── POI etiketter (delar källa med poi) ──
     {
-      id: 'poi-labels', sourceId: 'poi', file: null,   // återanvänder 'poi'-källan
+      id: 'poi-labels', sourceId: 'poi', file: 'data/poi_new.geojson',
       type: 'symbol',
       paint: {
         'text-color': '#1a2744',
@@ -1038,7 +1072,7 @@
 
     // ── Stora torget etikett ──
     {
-      id: 'poi-stora-torget-label', sourceId: 'poi-stora-torget', file: null,
+      id: 'poi-stora-torget-label', sourceId: 'poi-stora-torget', file: 'data/poi_stora_torget.geojson',
       type: 'symbol',
       paint: {
         'text-color': '#1a2744',
@@ -1064,15 +1098,15 @@
 
   // ── Vilka lager visas per sektion ──
   const SECTION_LAYERS = {
-    intro:          [],
-    vaglutning:     ['amcoff'],
-    vagunderlag:    ['amcoff'],
+    intro:          ['innerstad', 'poi-labels', 'poi-stora-torget-label'],
+    vaglutning:     ['amcoff', 'innerstad', 'poi-labels', 'poi-stora-torget-label'],
+    vagunderlag:    ['amcoff-surface', 'innerstad', 'poi-labels', 'poi-stora-torget-label'],
     lcp:            ['lcp-carolina', 'lcp-domkyrkan', 'lcp-stadsparken', 'lcp-vaksala',
-                     'shortest-carolina', 'shortest-vt',
-                     'poi', 'poi-labels', 'poi-stora-torget', 'poi-stora-torget-label'],
-    anlaggning:     ['poi', 'poi-labels', 'poi-stora-torget', 'poi-stora-torget-label'],
+                     'shortest-carolina', 'shortest-vt', 'shortest-domkyrkan', 'shortest-stadsparken',
+                     'poi', 'poi-labels', 'poi-stora-torget', 'poi-stora-torget-label', 'innerstad'],
+    anlaggning:     ['poi', 'poi-labels', 'poi-stora-torget', 'poi-stora-torget-label', 'innerstad'],
     sammanfattning: ['lcp-carolina', 'lcp-domkyrkan', 'lcp-stadsparken', 'lcp-vaksala',
-                     'poi', 'poi-labels', 'poi-stora-torget', 'poi-stora-torget-label']
+                     'poi', 'poi-labels', 'poi-stora-torget', 'poi-stora-torget-label', 'innerstad']
   };
 
   // Reducerad opacity för sammanfattningssektionen
@@ -1096,15 +1130,15 @@
       ]
     },
 
-    // TODO: Uppdatera items när amcoff-data re-exporterats med surface_type-attribut
     vagunderlag: {
       title: 'Vägunderlag',
-      note: 'Amcoff-data saknar attribut — re-exportera från QGIS med surface_type & cost',
       items: [
-        { type: 'line', color: '#27ae60', label: 'Asfalt (kostnad 1)',         style: 'solid' },
-        { type: 'line', color: '#f39c12', label: 'Betong/trä (kostnad 3)',     style: 'solid' },
-        { type: 'line', color: '#e67e22', label: 'Gatsten (kostnad 7)',        style: 'solid' },
-        { type: 'line', color: '#c0392b', label: 'Grus/gräs (kostnad 10)',    style: 'solid' }
+        { type: 'line', color: '#27ae60', label: 'Asfalt — kostnad 1',        style: 'solid' },
+        { type: 'line', color: '#3498db', label: 'Betongplattor — kostnad 3', style: 'solid' },
+        { type: 'line', color: '#8e44ad', label: 'Trä — kostnad 3',           style: 'solid' },
+        { type: 'line', color: '#e67e22', label: 'Gatsten — kostnad 7',       style: 'solid' },
+        { type: 'line', color: '#c0392b', label: 'Grus — kostnad 10',         style: 'solid' },
+        { type: 'line', color: '#95a5a6', label: 'Okänd — kostnad 1',         style: 'solid' }
       ]
     },
 
@@ -1216,7 +1250,7 @@
     });
 
     // Build layer list for this tab
-    const sharedLayers = ['poi', 'poi-labels', 'poi-stora-torget', 'poi-stora-torget-label'];
+    const sharedLayers = ['poi', 'poi-labels', 'poi-stora-torget', 'poi-stora-torget-label', 'innerstad'];
     const tabLayers    = [tab.lcpLayer, ...sharedLayers];
     if (tab.shortestLayer) tabLayers.push(tab.shortestLayer);
 
@@ -1243,12 +1277,14 @@
   function transitionToSection(section) {
     if (section === 'lcp') {
       // LCP section: delegate to tab logic
-      const sharedLayers = ['poi', 'poi-labels', 'poi-stora-torget', 'poi-stora-torget-label'];
+      const sharedLayers = ['poi', 'poi-labels', 'poi-stora-torget', 'poi-stora-torget-label', 'innerstad'];
       sharedLayers.forEach(id => {
         const def = LAYER_DEFS.find(d => d.id === id);
         if (def) ensureLayer(def);
         showLayer(id, 1);
       });
+      // Hide non-lcp layers (slope/surface) from previous sections
+      ['amcoff', 'amcoff-surface'].forEach(id => hideLayer(id));
       switchLcpTab(activeLcpTab);
       return;
     }
