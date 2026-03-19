@@ -604,52 +604,32 @@
       50% { transform: translateY(-6px); opacity: 1; }
     }
 
-    /* Map touch overlay */
-    #map-touch-overlay {
-      display: none;
-      position: absolute;
-      inset: 0;
-      z-index: 5;
-      cursor: pointer;
-      align-items: flex-end;
-      justify-content: center;
-      padding-bottom: 14px;
-    }
-    #map-touch-label {
-      display: inline-flex;
+    #map-expand-btn {
+      display: flex;
       align-items: center;
       gap: 6px;
-      background: rgba(27,51,73,0.72);
-      backdrop-filter: blur(4px);
-      color: white;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 6px 14px;
-      border-radius: 20px;
-      pointer-events: none;
-    }
-    #map-exit-explore {
-      display: none;
       position: absolute;
       bottom: 14px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 20;
+      left: 14px;
+      z-index: 25;
       background: var(--navy);
       color: white;
       border: none;
-      border-radius: 20px;
-      padding: 6px 16px;
+      border-radius: 8px;
+      padding: 8px 13px;
       font-size: 11px;
       font-weight: 700;
       font-family: 'Inter', sans-serif;
       letter-spacing: 0.04em;
-      text-transform: uppercase;
       cursor: pointer;
       box-shadow: var(--shadow);
-      white-space: nowrap;
+    }
+    #map-col.map-fullscreen {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      height: 100svh;
+      width: 100%;
     }
   }
   </style>
@@ -839,13 +819,10 @@
 
   <main id="map-col">
     <div id="map" role="application" aria-label="Interaktiv karta över Uppsala innerstad"></div>
-    <div id="map-touch-overlay" aria-hidden="true">
-      <span id="map-touch-label">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M7 1C4.239 1 2 3.239 2 6s2.239 5 5 5 5-2.239 5-5-2.239-5-5-5zm0 9a4 4 0 110-8 4 4 0 010 8z" fill="white" opacity=".8"/><circle cx="7" cy="6" r="1.5" fill="white"/></svg>
-        Tryck för att styra kartan
-      </span>
-    </div>
-    <button id="map-exit-explore" aria-label="Avsluta kartläge">✕ Avsluta kartläge</button>
+    <button id="map-expand-btn" aria-label="Visa kartan i helskärm">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 4V1h3M9 1h3v3M12 9v3H9M4 12H1V9" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Helskärm
+    </button>
     <div id="section-label">Överblick — Uppsala innerstad</div>
     <div id="legend" class="mobile-hidden"></div>
     <button id="legend-toggle" aria-label="Visa/dölj teckenförklaring">
@@ -1060,40 +1037,41 @@
     }, { passive: true, once: true });
   })();
 
-  // ── Mobile map interaction lock ──
+  // ── Mobile map helskärm + interaktionslås ──
   (function() {
     if (!window.matchMedia('(max-width: 900px)').matches) return;
 
     map.dragPan.disable();
     map.touchZoomRotate.disable();
 
-    const mapCol  = document.getElementById('map-col');
-    const overlay = document.getElementById('map-touch-overlay');
-    const exitBtn = document.getElementById('map-exit-explore');
+    const mapCol   = document.getElementById('map-col');
+    const expandBtn = document.getElementById('map-expand-btn');
+    let fullscreen = false;
 
-    overlay.style.display = 'flex';
+    const svgExpand = '<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 4V1h3M9 1h3v3M12 9v3H9M4 12H1V9" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const svgClose  = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>';
 
-    let exploreMode = false;
+    // Prevent section swipe when in fullscreen
+    function stopIfFullscreen(e) { if (fullscreen) e.stopPropagation(); }
+    mapCol.addEventListener('touchstart', stopIfFullscreen, { passive: true });
+    mapCol.addEventListener('touchend',   stopIfFullscreen, { passive: true });
 
-    // Prevent swipe-navigation events from firing while in explore mode
-    function stopIfExplore(e) { if (exploreMode) e.stopPropagation(); }
-    mapCol.addEventListener('touchstart', stopIfExplore, { passive: true });
-    mapCol.addEventListener('touchend',   stopIfExplore, { passive: true });
-
-    overlay.addEventListener('click', () => {
-      exploreMode = true;
-      map.dragPan.enable();
-      map.touchZoomRotate.enable();
-      overlay.style.display = 'none';
-      exitBtn.style.display = 'block';
-    });
-
-    exitBtn.addEventListener('click', () => {
-      exploreMode = false;
-      map.dragPan.disable();
-      map.touchZoomRotate.disable();
-      overlay.style.display = 'flex';
-      exitBtn.style.display = 'none';
+    expandBtn.addEventListener('click', () => {
+      fullscreen = !fullscreen;
+      if (fullscreen) {
+        map.dragPan.enable();
+        map.touchZoomRotate.enable();
+        mapCol.classList.add('map-fullscreen');
+        expandBtn.innerHTML = svgClose + ' Stäng';
+        expandBtn.setAttribute('aria-label', 'Stäng helskärm');
+      } else {
+        map.dragPan.disable();
+        map.touchZoomRotate.disable();
+        mapCol.classList.remove('map-fullscreen');
+        expandBtn.innerHTML = svgExpand + ' Helskärm';
+        expandBtn.setAttribute('aria-label', 'Visa kartan i helskärm');
+      }
+      map.resize();
     });
   })();
 
