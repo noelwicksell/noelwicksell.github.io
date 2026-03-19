@@ -611,7 +611,6 @@
   <button class="progress-dot"        data-target="vagunderlag"    aria-label="Gå till Vägunderlag"></button>
   <button class="progress-dot"        data-target="lcp"            aria-label="Gå till Least Cost Path"></button>
   <button class="progress-dot"        data-target="anlaggning"     aria-label="Gå till Anläggningsanalys"></button>
-  <button class="progress-dot"        data-target="sammanfattning" aria-label="Gå till Sammanfattning"></button>
 </nav>
 
 <div id="app">
@@ -786,61 +785,27 @@
           <div class="section-number">05 / Analys</div>
           <h2>Anläggningsanalys</h2>
           <p class="subtitle">Wheelmap / OSM · Kernel Density</p>
-        </div>
-        <div class="section-body">
-          <p>Utöver gatunätverket analyserades enskilda platser och anläggningar med avseende på tillgänglighet. Data hämtades från <strong>Wheelmap</strong> och <strong>OpenStreetMap</strong> via wheelchair-taggen.</p>
-
-          <ul class="info-list">
-            <li><span>wheelchair=yes</span><span class="tag" style="color:#4caf50;">Tillgänglig</span></li>
-            <li><span>wheelchair=limited</span><span class="tag" style="color:#ff9800;">Begränsad</span></li>
-            <li><span>wheelchair=no</span><span class="tag" style="color:#ef5350;">Otillgänglig</span></li>
-          </ul>
-
-          <p>Kernel Density-analys (KDE) användes för att identifiera koncentrationer av tillgängliga respektive otillgängliga platser — ett heatmap-perspektiv på var tillgängligheten är som bäst och sämst.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- 6. Sammanfattning -->
-    <section class="section dimmed" data-section="sammanfattning">
-      <div class="section-inner">
-        <div class="section-header">
-          <div class="section-number">06 / Slutsats</div>
-          <h2>Sammanfattning &amp; diskussion</h2>
-          <p class="subtitle">Vad visar analyserna — och vad saknas?</p>
-          <div class="sam-tabs" role="tablist" aria-label="Sammanfattning-lager">
-            <button class="sam-tab-btn active" data-samlayer="sam-lutning"  style="--tab-color:#5bb5c4">Lutning</button>
-            <button class="sam-tab-btn"        data-samlayer="sam-shortest" style="--tab-color:#1a2744">Kortaste linjer</button>
+          <div class="sam-tabs" role="tablist" aria-label="Anläggningsanalys-lager">
+            <button class="sam-tab-btn active" data-anlayer="anl-ej"          style="--tab-color:#c0392b">Ej tillgänglig</button>
+            <button class="sam-tab-btn"        data-anlayer="anl-tillganglig" style="--tab-color:#27ae60">Tillgänglig</button>
+            <button class="sam-tab-btn"        data-anlayer="anl-lutning"     style="--tab-color:#5bb5c4">Lutning</button>
+            <button class="sam-tab-btn"        data-anlayer="anl-shortest"    style="--tab-color:#1a2744">Kortaste linjer</button>
           </div>
         </div>
         <div class="section-body">
-          <p>Analyserna visar att Uppsala innerstad har stora variationer i tillgänglighet för rullstolsanvändare. Historiska gatumiljöer med gatsten och kuperade partier nära slottsbacken utgör de tydligaste hindren.</p>
+          <p>Utöver gatunätverket analyserades enskilda platser och anläggningar med avseende på tillgänglighet. Kernel Density-analys (KDE) identifierar koncentrationer av tillgängliga och otillgängliga platser.</p>
 
-          <div class="sam-panel active" data-sampanel="sam-lutning">
-            <p>Kartan visar Amcoff-nätets vägsegment färgsatta efter <strong>lutning</strong>. Branta partier nära slottsbacken och längs Svartbäcksgatan ger tydliga hinder för rullstolsanvändare.</p>
+          <div class="sam-panel active" data-anpanel="anl-ej">
+            <p>Heatmap för <strong>ej tillgängliga</strong> anläggningar visar var koncentrationer av otillgänglighet finns i Uppsala innerstad.</p>
           </div>
-          <div class="sam-panel" data-sampanel="sam-shortest">
-            <p>Kartan visar de <strong>kortaste linjerna</strong> i Amcoff-nätet — euklidiska direktlinjer som illustrerar hur stora omvägarna i LCP-rutterna faktiskt är.</p>
+          <div class="sam-panel" data-anpanel="anl-tillganglig">
+            <p>Heatmap för <strong>tillgängliga</strong> anläggningar visar var tillgängligheten är som bäst i Uppsala innerstad.</p>
           </div>
-
-          <p>LCP-rutterna avviker markant från de kortaste vägarna i flera fall, vilket visar att optimal framkomlighet kräver omvägar för att undvika branta eller ojämna partier.</p>
-
-          <p><strong>Kunskapsluckor i studien:</strong></p>
-
-          <ul class="info-list">
-            <li><span>Vägbredd</span><span class="tag" style="color:#ff9800;">Saknas i data</span></li>
-            <li><span>Trottoarkanter / kantstöd</span><span class="tag" style="color:#ff9800;">Saknas i data</span></li>
-            <li><span>Barriärer (stolpar, pollare)</span><span class="tag" style="color:#ff9800;">Saknas i data</span></li>
-            <li><span>Övergångsställens utformning</span><span class="tag" style="color:#ff9800;">Saknas i data</span></li>
-          </ul>
-
-          <p>För mer nyanserade analyser krävs bättre och mer detaljerade data. Studien visar att GIS-verktyg har stor potential för tillgänglighetsanalys — men är beroende av datakvalitet.</p>
-
-          <div class="pill-row">
-            <span class="pill">Lantmäteriet DEM</span>
-            <span class="pill">Trafikverket Lastkajen</span>
-            <span class="pill">Silver Ways / J. Amcoff</span>
-            <span class="pill">Wheelmap / OSM</span>
+          <div class="sam-panel" data-anpanel="anl-lutning">
+            <p>Amcoff-nätets vägsegment färgsatta efter <strong>lutning</strong> — ett kompletterande perspektiv på framkomlighet i gatunätet.</p>
+          </div>
+          <div class="sam-panel" data-anpanel="anl-shortest">
+            <p>De <strong>kortaste linjerna</strong> i Amcoff-nätet illustrerar hur stora omvägarna i LCP-rutterna är jämfört med direktlinjen.</p>
           </div>
         </div>
       </div>
@@ -860,7 +825,6 @@
       <div class="dot" data-index="2"></div>
       <div class="dot" data-index="3"></div>
       <div class="dot" data-index="4"></div>
-      <div class="dot" data-index="5"></div>
     </div>
   </div>
 
@@ -917,21 +881,21 @@
     setTimeout(() => { labelEl.textContent = SECTION_LABELS[key] || ''; labelEl.style.opacity = '1'; }, 200);
   }
 
-  // ── Sammanfattning layer cycling ──
-  const SAM_LAYERS = ['sam-lutning', 'sam-shortest'];
-  let activeSamLayer = 'sam-lutning';
+  // ── Anläggningsanalys layer cycling ──
+  const ANL_LAYERS = ['anl-ej', 'anl-tillganglig', 'anl-lutning', 'anl-shortest'];
+  let activeAnlLayer = 'anl-ej';
 
-  function switchSamLayer(layer) {
-    activeSamLayer = layer;
-    document.querySelectorAll('.sam-tab-btn').forEach(b =>
-      b.classList.toggle('active', b.dataset.samlayer === layer));
-    document.querySelectorAll('.sam-panel').forEach(p =>
-      p.classList.toggle('active', p.dataset.sampanel === layer));
+  function switchAnlLayer(layer) {
+    activeAnlLayer = layer;
+    document.querySelectorAll('.sam-tab-btn[data-anlayer]').forEach(b =>
+      b.classList.toggle('active', b.dataset.anlayer === layer));
+    document.querySelectorAll('.sam-panel[data-anpanel]').forEach(p =>
+      p.classList.toggle('active', p.dataset.anpanel === layer));
     transitionToSection(layer);
     renderLegend(layer);
     const labelEl = document.getElementById('section-label');
     labelEl.style.opacity = '0';
-    setTimeout(() => { labelEl.textContent = SECTION_LABELS['sammanfattning'] || ''; labelEl.style.opacity = '1'; }, 200);
+    setTimeout(() => { labelEl.textContent = SECTION_LABELS[layer] || ''; labelEl.style.opacity = '1'; }, 200);
   }
 
   // ── Wheel: LCP/sammanfattning cyklar lager, annars scroll-snap ──
@@ -956,15 +920,15 @@
       return;
     }
 
-    if (activeSection === 'sammanfattning') {
+    if (activeSection === 'anlaggning') {
       if (scrollLocked) return;
       const forward = e.deltaY > 0;
-      const idx = SAM_LAYERS.indexOf(activeSamLayer);
+      const idx = ANL_LAYERS.indexOf(activeAnlLayer);
       if (forward) {
-        if (idx < SAM_LAYERS.length - 1) switchSamLayer(SAM_LAYERS[idx + 1]);
+        if (idx < ANL_LAYERS.length - 1) switchAnlLayer(ANL_LAYERS[idx + 1]);
         else textCol.scrollBy({ top: window.innerHeight * 1.5, behavior: 'smooth' });
       } else {
-        if (idx > 0) switchSamLayer(SAM_LAYERS[idx - 1]);
+        if (idx > 0) switchAnlLayer(ANL_LAYERS[idx - 1]);
         else textCol.scrollBy({ top: -window.innerHeight * 1.5, behavior: 'smooth' });
       }
       scrollLocked = true;
@@ -992,8 +956,7 @@
     vaglutning:     { center: [17.640, 59.860], zoom: 14,   pitch: 0, bearing: 0, duration: 2000 },
     vagunderlag:    { center: [17.635, 59.856], zoom: 14.5, pitch: 0, bearing: 0, duration: 2000 },
     lcp:            { center: [17.638, 59.858], zoom: 14,   pitch: 0, bearing: 0, duration: 2000 },
-    anlaggning:     { center: [17.638, 59.858], zoom: 13.5, pitch: 0, bearing: 0, duration: 2000 },
-    sammanfattning: { center: [17.638, 59.858], zoom: 13,   pitch: 0, bearing: 0, duration: 2000 }
+    anlaggning:     { center: [17.638, 59.858], zoom: 13.5, pitch: 0, bearing: 0, duration: 2000 }
   };
 
   const SECTION_LABELS = {
@@ -1005,11 +968,14 @@
     'lcp-domkyrkan':   'LCP → Domkyrkan',
     'lcp-stadsparken': 'LCP → Stadsparken',
     'lcp-vaksala':     'LCP → Vaksala torg',
-    anlaggning:        'Analys — Anläggningar & POI',
-    sammanfattning:    'Sammanfattning'
+    anlaggning:        'Analys — Anläggningsanalys',
+    'anl-ej':          'Heatmap — Ej tillgänglig',
+    'anl-tillganglig': 'Heatmap — Tillgänglig',
+    'anl-lutning':     'Analys — Lutning',
+    'anl-shortest':    'Analys — Kortaste linjer'
   };
 
-  const SECTION_ORDER = ['intro', 'vaglutning', 'vagunderlag', 'lcp', 'anlaggning', 'sammanfattning'];
+  const SECTION_ORDER = ['intro', 'vaglutning', 'vagunderlag', 'lcp', 'anlaggning'];
 
   // ── Layer definitions (lazy-loaded) ──
   // sourceId: which GeoJSON source to use (shared where possible)
@@ -1200,7 +1166,41 @@
       }
     },
 
-    // ── Sammanfattning lager 1: Amcoff lutning ──
+    // ── Anläggningsanalys: Heatmap_Rullstol — ej tillgänglig ──
+    {
+      id: 'anl-ej', sourceId: 'anl-ej', file: 'data/heatmap_ej.geojson',
+      type: 'circle',
+      paint: {
+        'circle-radius': 6,
+        'circle-color': '#c0392b',
+        'circle-stroke-color': '#ffffff',
+        'circle-stroke-width': 1,
+        'circle-opacity': 0,
+        'circle-opacity-transition': { duration: 400, delay: 0 },
+        'circle-stroke-opacity': 0,
+        'circle-stroke-opacity-transition': { duration: 400, delay: 0 }
+      },
+      layout: { visibility: 'none' }
+    },
+
+    // ── Anläggningsanalys: Heatmap_Rullstol — tillgänglig ──
+    {
+      id: 'anl-tillganglig', sourceId: 'anl-tillganglig', file: 'data/heatmap_tillganglig.geojson',
+      type: 'circle',
+      paint: {
+        'circle-radius': 6,
+        'circle-color': '#27ae60',
+        'circle-stroke-color': '#ffffff',
+        'circle-stroke-width': 1,
+        'circle-opacity': 0,
+        'circle-opacity-transition': { duration: 400, delay: 0 },
+        'circle-stroke-opacity': 0,
+        'circle-stroke-opacity-transition': { duration: 400, delay: 0 }
+      },
+      layout: { visibility: 'none' }
+    },
+
+    // ── Anläggningsanalys lager 3: Amcoff lutning ──
     {
       id: 'sam-lutning', sourceId: 'sam-lutning', file: 'data/amcoff_lutning.geojson',
       type: 'line',
@@ -1239,10 +1239,11 @@
     'lcp-domkyrkan':   ['lcp-domkyrkan',   'shortest-domkyrkan',   ...POI_LAYERS],
     'lcp-stadsparken': ['lcp-stadsparken', 'shortest-stadsparken', ...POI_LAYERS],
     'lcp-vaksala':     ['lcp-vaksala',     'shortest-vt',          ...POI_LAYERS],
-    anlaggning:        [...POI_LAYERS],
-    sammanfattning:    ['sam-lutning', ...POI_LAYERS],  // default: lager 1
-    'sam-lutning':     ['sam-lutning',  'innerstad'],
-    'sam-shortest':    ['sam-shortest', 'innerstad']
+    anlaggning:         ['anl-ej', 'innerstad'],  // default: first tab
+    'anl-ej':           ['anl-ej',          'innerstad'],
+    'anl-tillganglig':  ['anl-tillganglig',  'innerstad'],
+    'anl-lutning':      ['sam-lutning',      'innerstad'],
+    'anl-shortest':     ['sam-shortest',     'innerstad']
   };
 
   const SECTION_OPACITY = {};
@@ -1309,26 +1310,25 @@
       ]
     },
 
-    // TODO: Uppdatera legend med wheelchair-färger när attribut finns i POI-datan
-    anlaggning: {
-      title: 'Anläggningar & POI',
-      note: 'POI-data saknar wheelchair-attribut — lägg till yes/limited/no för färgkodning',
+    'anl-ej': {
+      title: 'Heatmap — Ej tillgänglig',
       items: [
-        { type: 'circle', color: '#c0392b', label: 'Stora Torget (start)' },
-        { type: 'circle', color: '#1a2744', label: 'Destination/POI'          },
-        { type: 'circle', color: '#27ae60', label: 'Tillgänglig (wheelchair=yes)',     note: 'ej i data ännu' },
-        { type: 'circle', color: '#f39c12', label: 'Begränsad (wheelchair=limited)',   note: 'ej i data ännu' },
-        { type: 'circle', color: '#c0392b', label: 'Otillgänglig (wheelchair=no)',     note: 'ej i data ännu' }
+        { type: 'circle', color: '#c0392b', label: 'Ej tillgänglig (wheelchair=no)' }
       ]
     },
-
-    'sam-lutning': {
+    'anl-tillganglig': {
+      title: 'Heatmap — Tillgänglig',
+      items: [
+        { type: 'circle', color: '#27ae60', label: 'Tillgänglig (wheelchair=yes)' }
+      ]
+    },
+    'anl-lutning': {
       title: 'Amcoff-nät — Lutning',
       items: [
         { type: 'line', color: '#5bb5c4', label: 'Vägsegment (lutning)', style: 'solid' }
       ]
     },
-    'sam-shortest': {
+    'anl-shortest': {
       title: 'Amcoff-nät — Kortaste linjer',
       items: [
         { type: 'line', color: '#1a2744', label: 'Kortaste linje', style: 'solid' }
@@ -1525,8 +1525,8 @@
 
         if (section === 'lcp') {
           switchLcpDest(activeLcpDest);
-        } else if (section === 'sammanfattning') {
-          switchSamLayer(activeSamLayer);
+        } else if (section === 'anlaggning') {
+          switchAnlLayer(activeAnlLayer);
         } else {
           transitionToSection(section);
           renderLegend(section);
@@ -1541,9 +1541,9 @@
       btn.addEventListener('click', () => switchLcpDest(btn.dataset.dest));
     });
 
-    // ── Sammanfattning tab-knappar: klick byter lager ──
-    document.querySelectorAll('.sam-tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => switchSamLayer(btn.dataset.samlayer));
+    // ── Anläggningsanalys tab-knappar: klick byter lager ──
+    document.querySelectorAll('.sam-tab-btn[data-anlayer]').forEach(btn => {
+      btn.addEventListener('click', () => switchAnlLayer(btn.dataset.anlayer));
     });
   });
 </script>
