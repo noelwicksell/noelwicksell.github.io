@@ -315,6 +315,97 @@
     #text-col::-webkit-scrollbar { width: 4px; }
     #text-col::-webkit-scrollbar-track { background: transparent; }
     #text-col::-webkit-scrollbar-thumb { background: var(--navy); border-radius: 2px; }
+
+    /* ── Legend ── */
+    #legend {
+      position: absolute;
+      bottom: 60px;
+      right: 16px;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(26,39,68,0.18);
+      border-radius: 12px;
+      padding: 14px 16px;
+      min-width: 210px;
+      max-width: 270px;
+      z-index: 20;
+      opacity: 0;
+      display: none;
+      transition: opacity 0.35s;
+      pointer-events: none;
+    }
+
+    .legend-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--navy);
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(26,39,68,0.12);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 6px 0;
+      font-size: 0.78rem;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .legend-swatch-line {
+      display: inline-block;
+      width: 28px;
+      flex-shrink: 0;
+      height: 0;
+    }
+
+    .legend-swatch-circle {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 1.5px rgba(0,0,0,0.2);
+      flex-shrink: 0;
+    }
+
+    .legend-note {
+      font-size: 0.70rem;
+      color: #c0392b;
+      margin-top: 8px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(26,39,68,0.08);
+      line-height: 1.45;
+    }
+
+    /* ── Popup ── */
+    .maplibregl-popup.map-popup .maplibregl-popup-content {
+      background: rgba(255,255,255,0.94);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(26,39,68,0.18);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      color: var(--navy);
+      box-shadow: 0 4px 14px rgba(26,39,68,0.14);
+      line-height: 1.5;
+    }
+
+    .maplibregl-popup.map-popup .maplibregl-popup-tip {
+      border-top-color: rgba(255,255,255,0.94);
+    }
+
+    .popup-cost {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
   </style>
 </head>
 <body>
@@ -504,6 +595,7 @@
   <div id="map-col">
     <div id="map"></div>
     <div id="section-label">Överblick — Uppsala innerstad</div>
+    <div id="legend"></div>
     <div id="progress-dots">
       <div class="dot active" data-index="0"></div>
       <div class="dot" data-index="1"></div>
@@ -517,7 +609,7 @@
 </div><!-- /app -->
 
 <script>
-  // ── Map setup — MapLibre GL JS (no token required) ──
+  // ── Map setup ──
   const map = new maplibregl.Map({
     container: 'map',
     style: {
@@ -534,13 +626,7 @@
           attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }
       },
-      layers: [{
-        id: 'carto-light-layer',
-        type: 'raster',
-        source: 'carto-light',
-        minzoom: 0,
-        maxzoom: 22
-      }],
+      layers: [{ id: 'carto-light-layer', type: 'raster', source: 'carto-light', minzoom: 0, maxzoom: 22 }],
       glyphs: 'https://fonts.openmaptiles.org/{fontstack}/{range}.pbf'
     },
     center: [17.638, 59.858],
@@ -549,21 +635,20 @@
     bearing: 0
   });
 
-  // Disable scroll zoom — page scroll should control scrollytelling
   map.scrollZoom.disable();
   map.addControl(new maplibregl.NavigationControl({ showCompass: true }), 'top-right');
 
-  // ── Section fly-to configs ──
-  const sectionConfigs = {
+  // ── Section configs ──
+  const SECTION_VIEWS = {
     intro:          { center: [17.638, 59.858], zoom: 13,   pitch: 0,  bearing: 0,   duration: 2000 },
-    vaglutning:     { center: [17.640, 59.860], zoom: 14,   pitch: 30, bearing: -10, duration: 2000 },
-    vagunderlag:    { center: [17.635, 59.856], zoom: 14.5, pitch: 20, bearing: 10,  duration: 2000 },
-    lcp:            { center: [17.638, 59.858], zoom: 14,   pitch: 45, bearing: -20, duration: 2000 },
-    anlaggning:     { center: [17.638, 59.858], zoom: 13.5, pitch: 10, bearing: 0,   duration: 2000 },
-    sammanfattning: { center: [17.638, 59.858], zoom: 12.5, pitch: 0,  bearing: 0,   duration: 2000 }
+    vaglutning:     { center: [17.640, 59.860], zoom: 14,   pitch: 0,  bearing: 0,   duration: 2000 },
+    vagunderlag:    { center: [17.635, 59.856], zoom: 14.5, pitch: 0,  bearing: 0,   duration: 2000 },
+    lcp:            { center: [17.638, 59.858], zoom: 14,   pitch: 0,  bearing: 0,   duration: 2000 },
+    anlaggning:     { center: [17.638, 59.858], zoom: 13.5, pitch: 0,  bearing: 0,   duration: 2000 },
+    sammanfattning: { center: [17.638, 59.858], zoom: 13,   pitch: 0,  bearing: 0,   duration: 2000 }
   };
 
-  const sectionLabels = {
+  const SECTION_LABELS = {
     intro:          'Överblick — Uppsala innerstad',
     vaglutning:     'Analys — Väglutning',
     vagunderlag:    'Analys — Vägunderlag',
@@ -572,163 +657,414 @@
     sammanfattning: 'Sammanfattning'
   };
 
-  const sectionOrder = ['intro', 'vaglutning', 'vagunderlag', 'lcp', 'anlaggning', 'sammanfattning'];
+  const SECTION_ORDER = ['intro', 'vaglutning', 'vagunderlag', 'lcp', 'anlaggning', 'sammanfattning'];
 
-  // ── Layer visibility per section ──
-  const sectionLayers = {
-    intro:          [],
-    vaglutning:     [],
-    vagunderlag:    ['amcoff-layer'],
-    lcp:            ['lcp-carolina-layer', 'lcp-domkyrkan-layer', 'lcp-stadsparken-layer', 'lcp-vaksala-layer',
-                     'shortest-carolina-layer', 'shortest-vt-layer'],
-    anlaggning:     ['poi-new-layer', 'poi-stora-torget-layer'],
-    sammanfattning: ['lcp-carolina-layer', 'lcp-domkyrkan-layer', 'poi-new-layer']
-  };
+  // ── Layer definitions (lazy-loaded) ──
+  // sourceId: which GeoJSON source to use (shared where possible)
+  // file: null means the source is already defined by another layer def
+  const LAYER_DEFS = [
+    // ── LCP routes ──
+    // Properties: "start point id", "end point id", "total cost"
+    {
+      id: 'lcp-carolina',    sourceId: 'lcp-carolina',    file: 'data/lcp_carolina.geojson',
+      type: 'line',
+      paint: { 'line-color': '#1a2744', 'line-width': 4, 'line-opacity': 0, 'line-opacity-transition': { duration: 400, delay: 0 } },
+      layout: { 'line-join': 'round', 'line-cap': 'round', visibility: 'none' }
+    },
+    {
+      id: 'lcp-domkyrkan',   sourceId: 'lcp-domkyrkan',   file: 'data/lcp_domkyrkan.geojson',
+      type: 'line',
+      paint: { 'line-color': '#c0392b', 'line-width': 4, 'line-opacity': 0, 'line-opacity-transition': { duration: 400, delay: 0 } },
+      layout: { 'line-join': 'round', 'line-cap': 'round', visibility: 'none' }
+    },
+    {
+      id: 'lcp-stadsparken', sourceId: 'lcp-stadsparken', file: 'data/lcp_stadsparken.geojson',
+      type: 'line',
+      paint: { 'line-color': '#27ae60', 'line-width': 4, 'line-opacity': 0, 'line-opacity-transition': { duration: 400, delay: 0 } },
+      layout: { 'line-join': 'round', 'line-cap': 'round', visibility: 'none' }
+    },
+    {
+      id: 'lcp-vaksala',     sourceId: 'lcp-vaksala',     file: 'data/lcp_vaksala.geojson',
+      type: 'line',
+      paint: { 'line-color': '#5bb5c4', 'line-width': 4, 'line-opacity': 0, 'line-opacity-transition': { duration: 400, delay: 0 } },
+      layout: { 'line-join': 'round', 'line-cap': 'round', visibility: 'none' }
+    },
 
-  const ALL_LAYERS = [
-    'lcp-carolina-layer', 'lcp-domkyrkan-layer', 'lcp-stadsparken-layer', 'lcp-vaksala-layer',
-    'amcoff-layer', 'shortest-carolina-layer', 'shortest-vt-layer',
-    'poi-new-layer', 'poi-stora-torget-layer'
+    // ── Kortaste väg (jämförelse, streckad) ──
+    // NOTE: shortest_st_carolina.geojson och shortest_st_vt.geojson saknar properties ({}).
+    // Styling är enbart visuell — ingen data-driven färgkodning möjlig.
+    {
+      id: 'shortest-carolina', sourceId: 'shortest-carolina', file: 'data/shortest_st_carolina.geojson',
+      type: 'line',
+      paint: { 'line-color': '#888888', 'line-width': 2.5, 'line-dasharray': [5, 3], 'line-opacity': 0, 'line-opacity-transition': { duration: 400, delay: 0 } },
+      layout: { 'line-join': 'round', visibility: 'none' }
+    },
+    {
+      id: 'shortest-vt',       sourceId: 'shortest-vt',       file: 'data/shortest_st_vt.geojson',
+      type: 'line',
+      paint: { 'line-color': '#888888', 'line-width': 2.5, 'line-dasharray': [5, 3], 'line-opacity': 0, 'line-opacity-transition': { duration: 400, delay: 0 } },
+      layout: { 'line-join': 'round', visibility: 'none' }
+    },
+
+    // ── Amcoff vägunderlag ──
+    // NOTE: amcoff_shortest_lines.geojson har tomma properties ({}).
+    // TODO: Re-exportera från QGIS med attributen surface_type och cost för data-driven färgkodning.
+    //       Önskad styling: färgskala baserad på friktionskostnad (asfalt=grön, gatsten=röd m.m.)
+    {
+      id: 'amcoff', sourceId: 'amcoff', file: 'data/amcoff_shortest_lines.geojson',
+      type: 'line',
+      paint: { 'line-color': '#e67e22', 'line-width': 1.5, 'line-opacity': 0, 'line-opacity-transition': { duration: 400, delay: 0 } },
+      layout: { 'line-join': 'round', visibility: 'none' }
+    },
+
+    // ── POI cirklar ──
+    // NOTE: poi_new.geojson har endast attributet "Namn" — saknar wheelchair=yes/limited/no.
+    // TODO: Lägg till wheelchair-attribut i GeoJSON för färgkodning av tillgänglighet.
+    //       Önskad styling: yes=#27ae60, limited=#f39c12, no=#c0392b
+    {
+      id: 'poi',             sourceId: 'poi', file: 'data/poi_new.geojson',
+      type: 'circle',
+      paint: {
+        'circle-radius': 9,
+        'circle-color': '#1a2744',
+        'circle-stroke-color': '#ffffff',
+        'circle-stroke-width': 2.5,
+        'circle-opacity': 0,
+        'circle-opacity-transition': { duration: 400, delay: 0 },
+        'circle-stroke-opacity': 0,
+        'circle-stroke-opacity-transition': { duration: 400, delay: 0 }
+      },
+      layout: { visibility: 'none' }
+    },
+
+    // ── POI etiketter (delar källa med poi) ──
+    {
+      id: 'poi-labels', sourceId: 'poi', file: null,   // återanvänder 'poi'-källan
+      type: 'symbol',
+      paint: {
+        'text-color': '#1a2744',
+        'text-halo-color': '#ffffff',
+        'text-halo-width': 2,
+        'text-opacity': 0,
+        'text-opacity-transition': { duration: 400, delay: 0 }
+      },
+      layout: {
+        'text-field': ['get', 'Namn'],
+        'text-size': 12,
+        'text-font': ['Open Sans Regular'],
+        'text-offset': [0, 1.6],
+        'text-anchor': 'top',
+        visibility: 'none'
+      }
+    },
+
+    // ── Stora torget (startpunkt) ──
+    {
+      id: 'poi-stora-torget', sourceId: 'poi-stora-torget', file: 'data/poi_stora_torget.geojson',
+      type: 'circle',
+      paint: {
+        'circle-radius': 10,
+        'circle-color': '#c0392b',
+        'circle-stroke-color': '#ffffff',
+        'circle-stroke-width': 2.5,
+        'circle-opacity': 0,
+        'circle-opacity-transition': { duration: 400, delay: 0 },
+        'circle-stroke-opacity': 0,
+        'circle-stroke-opacity-transition': { duration: 400, delay: 0 }
+      },
+      layout: { visibility: 'none' }
+    },
+
+    // ── Stora torget etikett ──
+    {
+      id: 'poi-stora-torget-label', sourceId: 'poi-stora-torget', file: null,
+      type: 'symbol',
+      paint: {
+        'text-color': '#1a2744',
+        'text-halo-color': '#ffffff',
+        'text-halo-width': 2,
+        'text-opacity': 0,
+        'text-opacity-transition': { duration: 400, delay: 0 }
+      },
+      layout: {
+        'text-field': ['get', 'Namn'],
+        'text-size': 12,
+        'text-font': ['Open Sans Regular'],
+        'text-offset': [0, 1.6],
+        'text-anchor': 'top',
+        visibility: 'none'
+      }
+    }
+
+    // TODO: Lägg till väglutningslager (slope) när data exporterats från QGIS.
+    //       Önskad styling: 'line-color': ['step', ['get', 'slope_pct'], '#27ae60', 2, '#f39c12', 4, '#c0392b']
+    // TODO: Lägg till KDE raster-overlay för anläggningsanalysen.
   ];
 
-  function setVisibleLayers(activeSection) {
-    const activeLayers = sectionLayers[activeSection] || [];
-    ALL_LAYERS.forEach(id => {
-      if (map.getLayer(id)) {
-        map.setLayoutProperty(id, 'visibility', activeLayers.includes(id) ? 'visible' : 'none');
-      }
+  // ── Vilka lager visas per sektion ──
+  const SECTION_LAYERS = {
+    intro:          [],
+    // TODO: Ersätt [] med väglutningslager när GeoJSON med slope-attribut finns
+    vaglutning:     [],
+    vagunderlag:    ['amcoff'],
+    lcp:            ['lcp-carolina', 'lcp-domkyrkan', 'lcp-stadsparken', 'lcp-vaksala',
+                     'shortest-carolina', 'shortest-vt',
+                     'poi', 'poi-labels', 'poi-stora-torget', 'poi-stora-torget-label'],
+    anlaggning:     ['poi', 'poi-labels', 'poi-stora-torget', 'poi-stora-torget-label'],
+    sammanfattning: ['lcp-carolina', 'lcp-domkyrkan', 'lcp-stadsparken', 'lcp-vaksala',
+                     'poi', 'poi-labels', 'poi-stora-torget', 'poi-stora-torget-label']
+  };
+
+  // Reducerad opacity för sammanfattningssektionen
+  const SECTION_OPACITY = {
+    sammanfattning: {
+      'lcp-carolina': 0.45, 'lcp-domkyrkan': 0.45, 'lcp-stadsparken': 0.45, 'lcp-vaksala': 0.45,
+      'poi': 0.7, 'poi-labels': 0.7, 'poi-stora-torget': 0.7, 'poi-stora-torget-label': 0.7
+    }
+  };
+
+  // ── Legend-konfigurationer ──
+  const LEGENDS = {
+    intro: null,
+
+    // TODO: Fyll i items med riktig lutningsskala när väglutningsdata finns
+    vaglutning: {
+      title: 'Väglutning',
+      note: 'Saknar data — exportera slope-lager från QGIS med lutning i procent som attribut',
+      items: [
+        { type: 'line', color: '#27ae60', label: '0–2 % (tillgänglig)', style: 'solid' },
+        { type: 'line', color: '#f39c12', label: '2–4 % (begränsad)',   style: 'solid' },
+        { type: 'line', color: '#c0392b', label: '> 4 % (kritisk)',     style: 'solid' }
+      ]
+    },
+
+    // TODO: Uppdatera items när amcoff-data re-exporterats med surface_type-attribut
+    vagunderlag: {
+      title: 'Vägunderlag',
+      note: 'Amcoff-data saknar attribut — re-exportera från QGIS med surface_type & cost',
+      items: [
+        { type: 'line', color: '#27ae60', label: 'Asfalt (kostnad 1)',         style: 'solid' },
+        { type: 'line', color: '#f39c12', label: 'Betong/trä (kostnad 3)',     style: 'solid' },
+        { type: 'line', color: '#e67e22', label: 'Gatsten (kostnad 7)',        style: 'solid' },
+        { type: 'line', color: '#c0392b', label: 'Grus/gräs (kostnad 10)',    style: 'solid' }
+      ]
+    },
+
+    lcp: {
+      title: 'Least Cost Path',
+      items: [
+        { type: 'line',   color: '#1a2744', label: 'LCP → Carolina Rediviva', style: 'solid' },
+        { type: 'line',   color: '#c0392b', label: 'LCP → Domkyrkan',         style: 'solid' },
+        { type: 'line',   color: '#27ae60', label: 'LCP → Stadsparken',       style: 'solid' },
+        { type: 'line',   color: '#5bb5c4', label: 'LCP → Vaksala torg',      style: 'solid' },
+        { type: 'line',   color: '#888888', label: 'Kortaste väg',            style: 'dashed' },
+        { type: 'circle', color: '#c0392b', label: 'Centralstationen (start)' },
+        { type: 'circle', color: '#1a2744', label: 'Destination'              }
+      ]
+    },
+
+    // TODO: Uppdatera legend med wheelchair-färger när attribut finns i POI-datan
+    anlaggning: {
+      title: 'Anläggningar & POI',
+      note: 'POI-data saknar wheelchair-attribut — lägg till yes/limited/no för färgkodning',
+      items: [
+        { type: 'circle', color: '#c0392b', label: 'Centralstationen (start)' },
+        { type: 'circle', color: '#1a2744', label: 'Destination/POI'          },
+        { type: 'circle', color: '#27ae60', label: 'Tillgänglig (wheelchair=yes)',     note: 'ej i data ännu' },
+        { type: 'circle', color: '#f39c12', label: 'Begränsad (wheelchair=limited)',   note: 'ej i data ännu' },
+        { type: 'circle', color: '#c0392b', label: 'Otillgänglig (wheelchair=no)',     note: 'ej i data ännu' }
+      ]
+    },
+
+    sammanfattning: {
+      title: 'Sammanfattning',
+      items: [
+        { type: 'line',   color: '#1a2744', label: 'LCP → Carolina Rediviva', style: 'solid' },
+        { type: 'line',   color: '#c0392b', label: 'LCP → Domkyrkan',         style: 'solid' },
+        { type: 'line',   color: '#27ae60', label: 'LCP → Stadsparken',       style: 'solid' },
+        { type: 'line',   color: '#5bb5c4', label: 'LCP → Vaksala torg',      style: 'solid' },
+        { type: 'circle', color: '#1a2744', label: 'Destinationer'            }
+      ]
+    }
+  };
+
+  // ── State ──
+  let activeSection = 'intro';
+  const loadedSources = new Set();
+  const loadedLayers  = new Set();
+
+  // ── Lazy-load helper ──
+  function ensureLayer(def) {
+    if (def.file && !loadedSources.has(def.sourceId)) {
+      map.addSource(def.sourceId, { type: 'geojson', data: def.file });
+      loadedSources.add(def.sourceId);
+    }
+    if (!loadedLayers.has(def.id)) {
+      const spec = { id: def.id, type: def.type, source: def.sourceId, paint: def.paint, layout: def.layout };
+      map.addLayer(spec);
+      loadedLayers.add(def.id);
+    }
+  }
+
+  // ── Opacity property name per layer type ──
+  function opacityProp(type) {
+    return type === 'line' ? 'line-opacity' : type === 'circle' ? 'circle-opacity' : 'text-opacity';
+  }
+
+  function showLayer(id, opacity) {
+    if (!loadedLayers.has(id)) return;
+    const def = LAYER_DEFS.find(d => d.id === id);
+    map.setLayoutProperty(id, 'visibility', 'visible');
+    requestAnimationFrame(() => {
+      map.setPaintProperty(id, opacityProp(def.type), opacity);
+      if (def.type === 'circle') map.setPaintProperty(id, 'circle-stroke-opacity', opacity);
     });
   }
 
-  // ── Load GeoJSON layers after map style loads ──
-  map.on('load', () => {
+  function hideLayer(id) {
+    if (!loadedLayers.has(id)) return;
+    const def = LAYER_DEFS.find(d => d.id === id);
+    map.setPaintProperty(id, opacityProp(def.type), 0);
+    if (def.type === 'circle') map.setPaintProperty(id, 'circle-stroke-opacity', 0);
+    setTimeout(() => {
+      if (loadedLayers.has(id)) map.setLayoutProperty(id, 'visibility', 'none');
+    }, 420);
+  }
 
-    // LCP routes
-    const lcpFiles = [
-      { id: 'lcp-carolina',    file: 'data/lcp_carolina.geojson',    color: '#4fc3f7' },
-      { id: 'lcp-domkyrkan',   file: 'data/lcp_domkyrkan.geojson',   color: '#81d4fa' },
-      { id: 'lcp-stadsparken', file: 'data/lcp_stadsparken.geojson', color: '#b3e5fc' },
-      { id: 'lcp-vaksala',     file: 'data/lcp_vaksala.geojson',     color: '#29b6f6' }
-    ];
+  // ── Transition layers on section change ──
+  function transitionToSection(section) {
+    const active   = SECTION_LAYERS[section] || [];
+    const overrides = SECTION_OPACITY[section] || {};
 
-    lcpFiles.forEach(({ id, file, color }) => {
-      map.addSource(id, { type: 'geojson', data: file });
-      map.addLayer({
-        id: id + '-layer',
-        type: 'line',
-        source: id,
-        layout: { 'line-join': 'round', 'line-cap': 'round', visibility: 'none' },
-        paint: { 'line-color': color, 'line-width': 3, 'line-opacity': 0.85 }
-      });
+    // Ensure and show incoming layers
+    active.forEach(id => {
+      const def = LAYER_DEFS.find(d => d.id === id);
+      if (def) ensureLayer(def);
+      showLayer(id, overrides[id] ?? 1);
     });
 
-    // Amcoff surface lines
-    map.addSource('amcoff', { type: 'geojson', data: 'data/amcoff_shortest_lines.geojson' });
-    map.addLayer({
-      id: 'amcoff-layer',
-      type: 'line',
-      source: 'amcoff',
-      layout: { 'line-join': 'round', visibility: 'none' },
-      paint: { 'line-color': '#ff8a65', 'line-width': 2, 'line-dasharray': [4, 2], 'line-opacity': 0.7 }
+    // Hide outgoing layers
+    loadedLayers.forEach(id => {
+      if (!active.includes(id)) hideLayer(id);
     });
+  }
 
-    // Shortest path comparison routes
-    const shortFiles = [
-      { id: 'shortest-carolina', file: 'data/shortest_st_carolina.geojson', color: '#ef9a9a' },
-      { id: 'shortest-vt',       file: 'data/shortest_st_vt.geojson',       color: '#f48fb1' }
-    ];
+  // ── Legend renderer ──
+  function renderLegend(section) {
+    const el  = document.getElementById('legend');
+    const cfg = LEGENDS[section];
 
-    shortFiles.forEach(({ id, file, color }) => {
-      map.addSource(id, { type: 'geojson', data: file });
-      map.addLayer({
-        id: id + '-layer',
-        type: 'line',
-        source: id,
-        layout: { 'line-join': 'round', visibility: 'none' },
-        paint: { 'line-color': color, 'line-width': 2, 'line-dasharray': [3, 3], 'line-opacity': 0.7 }
-      });
-    });
+    if (!cfg) {
+      el.style.opacity = '0';
+      setTimeout(() => { el.style.display = 'none'; el.innerHTML = ''; }, 350);
+      return;
+    }
 
-    // POI — general
-    map.addSource('poi-new', { type: 'geojson', data: 'data/poi_new.geojson' });
-    map.addLayer({
-      id: 'poi-new-layer',
-      type: 'circle',
-      source: 'poi-new',
-      layout: { visibility: 'none' },
-      paint: {
-        'circle-radius': 6,
-        'circle-color': ['match', ['get', 'wheelchair'],
-          'yes',     '#4caf50',
-          'limited', '#ff9800',
-          'no',      '#ef5350',
-          '#4fc3f7'
-        ],
-        'circle-stroke-color': 'rgba(255,255,255,0.4)',
-        'circle-stroke-width': 1.5,
-        'circle-opacity': 0.9
+    el.style.display = 'block';
+    requestAnimationFrame(() => { el.style.opacity = '1'; });
+
+    const items = cfg.items.map(item => {
+      const dimNote = item.note ? ` <span style="opacity:0.5;font-size:0.68rem">(${item.note})</span>` : '';
+      if (item.type === 'circle') {
+        return `<div class="legend-item">
+          <span class="legend-swatch-circle" style="background:${item.color}"></span>
+          <span>${item.label}${dimNote}</span>
+        </div>`;
       }
-    });
+      const border = item.style === 'dashed'
+        ? `border-top: 2.5px dashed ${item.color}`
+        : `border-top: 3.5px solid ${item.color}`;
+      return `<div class="legend-item">
+        <span class="legend-swatch-line" style="${border}"></span>
+        <span>${item.label}</span>
+      </div>`;
+    }).join('');
 
-    // POI — Stora Torget
-    map.addSource('poi-stora-torget', { type: 'geojson', data: 'data/poi_stora_torget.geojson' });
-    map.addLayer({
-      id: 'poi-stora-torget-layer',
-      type: 'circle',
-      source: 'poi-stora-torget',
-      layout: { visibility: 'none' },
-      paint: {
-        'circle-radius': 7,
-        'circle-color': '#4fc3f7',
-        'circle-stroke-color': 'rgba(255,255,255,0.5)',
-        'circle-stroke-width': 2,
-        'circle-opacity': 0.95
-      }
-    });
+    const noteHtml = cfg.note
+      ? `<div class="legend-note">⚠ ${cfg.note}</div>`
+      : '';
 
-    // TODO: Lägg till popups för POI-punkter
-    // TODO: Lägg till legend för väglutning
-    // TODO: Lägg till KDE raster-lager som overlay
+    el.innerHTML = `<div class="legend-title">${cfg.title}</div>${items}${noteHtml}`;
+  }
+
+  // ── Popups ──
+  const popup = new maplibregl.Popup({
+    closeButton: false, closeOnClick: false, className: 'map-popup', maxWidth: '220px'
   });
 
-  // ── IntersectionObserver (scrollytelling) ──
-  let activeSection = 'intro';
+  const LCP_DEST = {
+    'lcp-carolina':    'Carolina Rediviva',
+    'lcp-domkyrkan':   'Domkyrkan',
+    'lcp-stadsparken': 'Stadsparken',
+    'lcp-vaksala':     'Vaksala torg'
+  };
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      const section = entry.target.dataset.section;
-      if (section === activeSection) return;
-      activeSection = section;
+  map.on('load', () => {
 
-      // Fly map to section view
-      if (sectionConfigs[section]) {
-        map.flyTo(sectionConfigs[section]);
-      }
-
-      // Update top label
-      const labelEl = document.getElementById('section-label');
-      if (labelEl) labelEl.textContent = sectionLabels[section] || '';
-
-      // Update progress dots
-      const idx = sectionOrder.indexOf(section);
-      document.querySelectorAll('.dot').forEach((dot, i) => {
-        dot.classList.toggle('active', i === idx);
+    // LCP: klick-popup med destination och total kostnad
+    Object.keys(LCP_DEST).forEach(id => {
+      map.on('click', id, e => {
+        const props = e.features[0].properties;
+        const cost  = props['total cost']
+          ? Math.round(props['total cost']).toLocaleString('sv-SE')
+          : '—';
+        popup.setLngLat(e.lngLat)
+          .setHTML(`<strong>${LCP_DEST[id]}</strong>
+                    <div class="popup-cost">Total kostnad: ${cost}</div>`)
+          .addTo(map);
       });
-
-      // Dim inactive sections
-      document.querySelectorAll('[data-section]').forEach(s => {
-        s.classList.toggle('dimmed', s.dataset.section !== section);
-      });
-
-      // Show/hide layers
-      if (map.isStyleLoaded()) {
-        setVisibleLayers(section);
-      }
+      map.on('mouseenter', id, () => { map.getCanvas().style.cursor = 'pointer'; });
+      map.on('mouseleave', id, () => { map.getCanvas().style.cursor = ''; });
     });
-  }, { threshold: 0.4 });
 
-  document.querySelectorAll('[data-section]').forEach(s => observer.observe(s));
+    // POI: hover-popup med namn
+    ['poi', 'poi-stora-torget'].forEach(id => {
+      map.on('mouseenter', id, e => {
+        const coords = e.features[0].geometry.coordinates.slice();
+        const namn   = e.features[0].properties['Namn'] || '—';
+        map.getCanvas().style.cursor = 'pointer';
+        popup.setLngLat(coords).setHTML(`<strong>${namn}</strong>`).addTo(map);
+      });
+      map.on('mouseleave', id, () => {
+        map.getCanvas().style.cursor = '';
+        popup.remove();
+      });
+    });
+
+    // Stäng LCP-popup vid klick utanför
+    map.on('click', e => {
+      const features = map.queryRenderedFeatures(e.point, {
+        layers: [...Object.keys(LCP_DEST)]
+      });
+      if (!features.length) popup.remove();
+    });
+
+    // ── IntersectionObserver (scrollytelling) ──
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const section = entry.target.dataset.section;
+        if (section === activeSection) return;
+        activeSection = section;
+
+        map.flyTo(SECTION_VIEWS[section]);
+
+        document.getElementById('section-label').textContent = SECTION_LABELS[section] || '';
+
+        const idx = SECTION_ORDER.indexOf(section);
+        document.querySelectorAll('.dot').forEach((dot, i) => dot.classList.toggle('active', i === idx));
+
+        document.querySelectorAll('[data-section]').forEach(s => {
+          s.classList.toggle('dimmed', s.dataset.section !== section);
+        });
+
+        transitionToSection(section);
+        renderLegend(section);
+      });
+    }, { threshold: 0.4 });
+
+    document.querySelectorAll('[data-section]').forEach(s => observer.observe(s));
+  });
 </script>
 
 </body>
