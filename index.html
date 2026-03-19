@@ -564,6 +564,46 @@
       .info-list { margin: 5px 0; }
       .info-list li { font-size: 0.75rem; padding: 3px 0; }
     }
+
+  /* Swipe hint — bara mobil */
+  @media (max-width: 900px) {
+    #swipe-hint {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      pointer-events: none;
+      z-index: 1000;
+      transition: opacity 0.6s ease;
+    }
+    #swipe-hint.hidden { opacity: 0; }
+
+    .swipe-hint-arrow {
+      font-size: 20px;
+      color: rgba(27,51,73,0.7);
+      animation: swipe-bounce 1.4s ease-in-out infinite;
+    }
+    .swipe-hint-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: rgba(27,51,73,0.6);
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(4px);
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(27,51,73,0.12);
+    }
+    @keyframes swipe-bounce {
+      0%, 100% { transform: translateY(0); opacity: 0.7; }
+      50% { transform: translateY(-6px); opacity: 1; }
+    }
+  }
   </style>
 </head>
 <body>
@@ -937,6 +977,33 @@
   document.addEventListener('touchend', e => {
     handleSwipe(touchStartY - e.changedTouches[0].clientY);
   }, { passive: true });
+
+  // ── Swipe hint (mobil, visas bara vid första besök) ──
+  (function() {
+    const hint = document.getElementById('swipe-hint');
+    if (!hint) return;
+
+    // Dölj direkt om redan sett
+    if (localStorage.getItem('swipeHintSeen')) {
+      hint.style.display = 'none';
+      return;
+    }
+
+    function dismissHint() {
+      hint.classList.add('hidden');
+      setTimeout(() => { hint.style.display = 'none'; }, 600);
+      localStorage.setItem('swipeHintSeen', '1');
+    }
+
+    // Tona ut efter 3 sekunder
+    setTimeout(dismissHint, 3000);
+
+    // Tona ut direkt vid första svep
+    document.addEventListener('touchend', function onFirstSwipe() {
+      dismissHint();
+      document.removeEventListener('touchend', onFirstSwipe);
+    }, { passive: true, once: true });
+  })();
 
   // ── Section configs ──
   // bounds: [[west, south], [east, north]] — fitBounds calculates zoom automatically per viewport size
@@ -1424,6 +1491,11 @@
     });
   });
 </script>
+
+<div id="swipe-hint" aria-hidden="true">
+  <span class="swipe-hint-arrow">↑</span>
+  <span class="swipe-hint-label">Svep för nästa</span>
+</div>
 
 </body>
 </html>
