@@ -530,22 +530,36 @@
       #progress-nav { display: none; }
       #text-col { scroll-snap-type: none; overflow: hidden; }
       .section { min-height: 100%; scroll-snap-align: none; }
-      .sidebar-header { padding: 12px 20px 10px; }
-      .sidebar-header h1 { font-size: 1.1rem; }
-      .section-header { padding: 10px 16px; }
+
+      .sidebar-header { padding: 8px 16px; }
+      .sidebar-header h1 { font-size: 1rem; }
+
+      .section-header { padding: 8px 14px; }
       .section-number { display: none; }
-      h2 { font-size: 1.1rem; margin-bottom: 4px; }
-      .section-header .subtitle { font-size: 0.75rem; }
-      .lcp-tabs, .sam-tabs { margin-top: 8px; gap: 5px; }
-      .lcp-tab-btn, .sam-tab-btn { padding: 6px 4px; font-size: 9px; }
-      .section-body { padding: 12px 18px 24px; }
+      h2 { font-size: 1rem; margin-bottom: 3px; }
+      .section-header .subtitle { font-size: 0.72rem; }
+      .lcp-tabs, .sam-tabs { margin-top: 6px; gap: 4px; }
+      .lcp-tab-btn, .sam-tab-btn { padding: 5px 4px; font-size: 9px; }
       .lcp-tabs { grid-template-columns: repeat(2, 1fr); }
-      .content-card { padding: 14px; margin-bottom: 10px; }
-      .stat-row { gap: 8px; margin: 8px 0; }
-      .stat-box { padding: 10px 12px; }
-      .stat-box .value { font-size: 1.1rem; }
-      p { font-size: 0.85rem; line-height: 1.55; margin-bottom: 10px; }
-      .mobile-hide { display: none; }
+
+      .section-body { padding: 8px 14px 14px; }
+      p { font-size: 0.78rem; line-height: 1.38; margin-bottom: 7px; }
+      .content-card { padding: 10px; margin-bottom: 8px; border-radius: 10px; }
+      .stat-row { gap: 6px; margin: 6px 0; }
+      .stat-box { padding: 8px 10px; }
+      .stat-box .value { font-size: 1rem; }
+      .stat-box .label { font-size: 0.62rem; }
+
+      .pill-row { margin: 6px 0; gap: 4px; }
+      .pill { font-size: 9px; padding: 3px 7px; }
+
+      .team-grid { gap: 5px; margin: 6px 0; }
+      .team-member { padding: 7px 8px; font-size: 0.72rem; }
+      .team-member strong { font-size: 0.78rem; }
+
+      .formula-box { padding: 8px; font-size: 0.8rem; margin: 8px 0; }
+      .info-list { margin: 8px 0; }
+      .info-list li { font-size: 0.78rem; padding: 5px 0; }
     }
   </style>
 </head>
@@ -572,17 +586,17 @@
           <div class="section-body">
             <div class="content-card">
               <p>Hur tillgänglig är Uppsala innerstad för rullstolsanvändare? FN:s Agenda 2030, mål 11 <em>Hållbara städer och samhällen</em>, betonar behovet av inkluderande stadsplanering. I Uppsala pågår arbetet med en ny innerstadsstrategi — och paraplyföreningen <strong>Funktionsrätt Uppsala</strong> har lyft kritiska brister: problematiska markbeläggningar, hinder på gångvägar och bristande tillgänglighet längs Fyrisån.</p>
-              <p class="mobile-hide">Denna studie kartlägger och analyserar rullstolsframkomlighet i Uppsalas centrala delar genom GIS-analyser av väglutning, vägunderlag och optimala rutter.</p>
+              <p class="">Denna studie kartlägger och analyserar rullstolsframkomlighet i Uppsalas centrala delar genom GIS-analyser av väglutning, vägunderlag och optimala rutter.</p>
             </div>
 
-            <div class="pill-row mobile-hide">
+            <div class="pill-row">
               <span class="pill">FN:s mål 11.2</span>
               <span class="pill">FN:s mål 11.7</span>
               <span class="pill">GIS-analys</span>
               <span class="pill">Uppsala innerstad</span>
             </div>
 
-            <div class="team-grid mobile-hide">
+            <div class="team-grid">
               <div class="team-member"><strong>Axel Edlund</strong>Kulturgeografiska inst.</div>
               <div class="team-member"><strong>Isak Karlsson</strong>Kulturgeografiska inst.</div>
               <div class="team-member"><strong>Simon Normelius</strong>Kulturgeografiska inst.</div>
@@ -602,7 +616,7 @@
           </div>
           <div class="section-body">
             <div class="content-card">
-              <p class="mobile-hide">Gatans lutning är en av de viktigaste faktorerna för rullstolsframkomlighet. Analysen genomfördes med QGIS-tillägget <strong>Road Slope Calculator</strong>, som kombinerar Lantmäteriets höjdmodell (1 m upplösning) med vägnätverket.</p>
+              <p class="">Gatans lutning är en av de viktigaste faktorerna för rullstolsframkomlighet. Analysen genomfördes med QGIS-tillägget <strong>Road Slope Calculator</strong>, som kombinerar Lantmäteriets höjdmodell (1 m upplösning) med vägnätverket.</p>
               <div class="formula-box">Lutning (%) = (ΔZ / Δd) × 100</div>
             </div>
 
@@ -637,7 +651,7 @@
           </div>
           <div class="section-body">
             <div class="content-card">
-              <p class="mobile-hide">Vägunderlagets typ påverkar kraftigt framkomligheten. Data för markbeläggning hämtades från <strong>Kulturgeografiska institutionen</strong> och kompletterades manuellt.</p>
+              <p class="">Vägunderlagets typ påverkar kraftigt framkomligheten. Data för markbeläggning hämtades från <strong>Kulturgeografiska institutionen</strong> och kompletterades manuellt.</p>
               <p>Ytorna klassificerades och viktades efter friktionskoefficient — hårdare och jämnare underlag ger lägre kostnadsvärde:</p>
               <ul class="info-list">
                 <li><span>Asfalt</span><span class="tag">Kostnad: 1</span></li>
@@ -666,7 +680,7 @@
             </div>
           </div>
           <div class="section-body">
-            <p class="mobile-hide">En <strong>Least Cost Path (LCP)</strong>-analys identifierar den rutt med lägst samlad kostnad — inte den kortaste sträckan. Rullstolskostnaden beräknas utifrån lutning och vägunderlag kombinerat.</p>
+            <p class="">En <strong>Least Cost Path (LCP)</strong>-analys identifierar den rutt med lägst samlad kostnad — inte den kortaste sträckan. Rullstolskostnaden beräknas utifrån lutning och vägunderlag kombinerat.</p>
 
             <div class="content-card">
               <div class="lcp-panel active" data-panel="carolina">
@@ -715,7 +729,7 @@
             </div>
           </div>
           <div class="section-body">
-            <p class="mobile-hide">Utöver gatunätverket analyserades enskilda platser och anläggningar via Kernel Density-analys (KDE).</p>
+            <p class="">Utöver gatunätverket analyserades enskilda platser och anläggningar via Kernel Density-analys (KDE).</p>
             <div class="content-card">
               <div class="sam-panel active" data-anpanel="anl-ej">
                 <p>Heatmap för <strong>ej tillgängliga</strong> anläggningar visar var koncentrationer av otillgänglighet finns i Uppsala innerstad.</p>
