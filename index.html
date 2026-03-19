@@ -745,56 +745,74 @@
     setTimeout(() => { labelEl.textContent = SECTION_LABELS[layer] || ''; labelEl.style.opacity = '1'; }, 200);
   }
 
-  // ── Wheel: redirect to text-col; LCP/anlaggning cycle layers ──
+  // ── Sektionsnavigering ──
+  function scrollToSection(key) {
+    const el = document.querySelector('[data-section="' + key + '"]');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function navigateSection(forward) {
+    const secs = ['intro', 'vaglutning', 'vagunderlag', 'lcp', 'anlaggning'];
+    const next = secs[secs.indexOf(activeSection) + (forward ? 1 : -1)];
+    if (next) scrollToSection(next);
+  }
+
+  // ── Wheel: ett sektionshop per scrollgest ──
   let scrollLocked = false;
 
   document.addEventListener('wheel', e => {
     e.preventDefault();
+    if (scrollLocked) return;
+    const forward = e.deltaY > 0;
+    scrollLocked = true;
+    setTimeout(() => { scrollLocked = false; }, 750);
 
     if (activeSection === 'lcp') {
-      if (scrollLocked) return;
-      const forward = e.deltaY > 0;
       const idx = LCP_DESTS.indexOf(activeLcpDest);
-      if (forward) {
-        if (idx < LCP_DESTS.length - 1) switchLcpDest(LCP_DESTS[idx + 1]);
-        else textCol.scrollBy({ top: window.innerHeight * 1.5, behavior: 'smooth' });
-      } else {
-        if (idx > 0) switchLcpDest(LCP_DESTS[idx - 1]);
-        else textCol.scrollBy({ top: -window.innerHeight * 1.5, behavior: 'smooth' });
-      }
-      scrollLocked = true;
-      setTimeout(() => { scrollLocked = false; }, 600);
-      return;
+      if (forward && idx < LCP_DESTS.length - 1) { switchLcpDest(LCP_DESTS[idx + 1]); return; }
+      if (!forward && idx > 0)                   { switchLcpDest(LCP_DESTS[idx - 1]); return; }
     }
 
     if (activeSection === 'anlaggning') {
-      if (scrollLocked) return;
-      const forward = e.deltaY > 0;
       const idx = ANL_LAYERS.indexOf(activeAnlLayer);
-      if (forward) {
-        if (idx < ANL_LAYERS.length - 1) switchAnlLayer(ANL_LAYERS[idx + 1]);
-        else textCol.scrollBy({ top: window.innerHeight * 1.5, behavior: 'smooth' });
-      } else {
-        if (idx > 0) switchAnlLayer(ANL_LAYERS[idx - 1]);
-        else textCol.scrollBy({ top: -window.innerHeight * 1.5, behavior: 'smooth' });
-      }
-      scrollLocked = true;
-      setTimeout(() => { scrollLocked = false; }, 600);
-      return;
+      if (forward && idx < ANL_LAYERS.length - 1) { switchAnlLayer(ANL_LAYERS[idx + 1]); return; }
+      if (!forward && idx > 0)                    { switchAnlLayer(ANL_LAYERS[idx - 1]); return; }
     }
 
-    textCol.scrollBy({ top: e.deltaY, behavior: 'auto' });
+    navigateSection(forward);
   }, { passive: false });
 
-  // Touch på kartan → scrolla text-col
+  // ── Touch (mobil + karta): svep för att byta sektion ──
   let touchStartY = 0;
-  document.getElementById('map-col').addEventListener('touchstart', e => {
+  let touchLocked = false;
+
+  function handleSwipe(dy) {
+    if (touchLocked || Math.abs(dy) < 40) return;
+    touchLocked = true;
+    setTimeout(() => { touchLocked = false; }, 800);
+    const forward = dy > 0;
+
+    if (activeSection === 'lcp') {
+      const idx = LCP_DESTS.indexOf(activeLcpDest);
+      if (forward && idx < LCP_DESTS.length - 1) { switchLcpDest(LCP_DESTS[idx + 1]); return; }
+      if (!forward && idx > 0)                   { switchLcpDest(LCP_DESTS[idx - 1]); return; }
+    }
+
+    if (activeSection === 'anlaggning') {
+      const idx = ANL_LAYERS.indexOf(activeAnlLayer);
+      if (forward && idx < ANL_LAYERS.length - 1) { switchAnlLayer(ANL_LAYERS[idx + 1]); return; }
+      if (!forward && idx > 0)                    { switchAnlLayer(ANL_LAYERS[idx - 1]); return; }
+    }
+
+    navigateSection(forward);
+  }
+
+  document.addEventListener('touchstart', e => {
     touchStartY = e.touches[0].clientY;
   }, { passive: true });
-  document.getElementById('map-col').addEventListener('touchmove', e => {
-    const dy = touchStartY - e.touches[0].clientY;
-    touchStartY = e.touches[0].clientY;
-    textCol.scrollBy({ top: dy, behavior: 'auto' });
+
+  document.addEventListener('touchend', e => {
+    handleSwipe(touchStartY - e.changedTouches[0].clientY);
   }, { passive: true });
 
   // ── Section configs ──
