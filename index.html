@@ -483,6 +483,24 @@
     .lcp-tab-panel { display: none; }
     .lcp-tab-panel.active { display: block; }
 
+    /* ── LCP scroll-block per destination ── */
+    .lcp-block {
+      min-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 40px 0;
+      border-top: 1px solid var(--glass-border);
+    }
+
+    .lcp-block:first-child { border-top: none; }
+
+    .lcp-dest-title {
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
     .no-data-note {
       font-size: 0.78rem;
       color: #c0392b;
@@ -693,87 +711,68 @@
       </div>
     </section>
 
-    <!-- 4a. LCP → Carolina Rediviva -->
-    <section class="section dimmed" data-section="lcp-carolina">
+    <!-- 4. Least Cost Path -->
+    <section class="section dimmed" data-section="lcp">
       <div class="section-inner">
         <div class="section-header">
-          <div class="section-number">04 / Analys — 1 av 4</div>
-          <h2>Carolina Rediviva</h2>
-          <p class="subtitle">Stora Torget → Carolina Rediviva · Least Cost Path</p>
+          <div class="section-number">04 / Analys</div>
+          <h2>Least Cost Path</h2>
+          <p class="subtitle">Multikriterieanalys: lutning + underlag</p>
         </div>
         <div class="section-body">
-          <p>En <strong>Least Cost Path (LCP)</strong>-analys identifierar den rutt med lägst samlad kostnad — inte den kortaste sträckan, utan den mest framkomliga för rullstol.</p>
-          <div class="stat-row">
-            <div class="stat-box"><span class="value">12 324</span><span class="label">Total kostnad (LCP)</span></div>
-          </div>
-          <ul class="info-list">
-            <li><span>LCP-rutt</span><span class="tag" style="color:#1a2744">Heldragen, marinblå</span></li>
-            <li><span>Kortaste väg</span><span class="tag" style="color:#888">Streckad, grå</span></li>
-          </ul>
-          <p>LCP-rutten avviker från kortaste vägen för att undvika branta eller ojämna partier. Avvikelsen visar var tillgänglighetshinder finns.</p>
-        </div>
-      </div>
-    </section>
+          <p>En <strong>Least Cost Path (LCP)</strong>-analys identifierar den rutt med lägst samlad kostnad — inte den kortaste sträckan, utan den mest framkomliga för rullstol. Scrolla för att se varje destination.</p>
 
-    <!-- 4b. LCP → Domkyrkan -->
-    <section class="section dimmed" data-section="lcp-domkyrkan">
-      <div class="section-inner">
-        <div class="section-header">
-          <div class="section-number">04 / Analys — 2 av 4</div>
-          <h2>Domkyrkan</h2>
-          <p class="subtitle">Stora Torget → Domkyrkan · Least Cost Path</p>
-        </div>
-        <div class="section-body">
-          <div class="stat-row">
-            <div class="stat-box"><span class="value">57 172</span><span class="label">Total kostnad (LCP)</span></div>
+          <div class="lcp-block" data-lcp="carolina">
+            <h3 class="lcp-dest-title" style="color:#1a2744">Carolina Rediviva</h3>
+            <p class="subtitle">Stora Torget → Carolina Rediviva</p>
+            <div class="stat-row">
+              <div class="stat-box"><span class="value">12 324</span><span class="label">Total kostnad (LCP)</span></div>
+            </div>
+            <ul class="info-list">
+              <li><span>LCP-rutt</span><span class="tag" style="color:#1a2744">Heldragen, marinblå</span></li>
+              <li><span>Kortaste väg</span><span class="tag" style="color:#888">Streckad, grå</span></li>
+            </ul>
+            <p>LCP-rutten avviker från kortaste vägen för att undvika branta eller ojämna partier. Avvikelsen visar var tillgänglighetshinder finns.</p>
           </div>
-          <ul class="info-list">
-            <li><span>LCP-rutt</span><span class="tag" style="color:#c0392b">Heldragen, röd</span></li>
-            <li><span>Kortaste väg</span><span class="tag" style="color:#888">Streckad, grå</span></li>
-          </ul>
-          <p>Den höga totalkostnaden speglar de branta och stenbelagda gatorna kring domkyrkan, som utgör ett av stadens tydligaste tillgänglighetshinder.</p>
-        </div>
-      </div>
-    </section>
 
-    <!-- 4c. LCP → Stadsparken -->
-    <section class="section dimmed" data-section="lcp-stadsparken">
-      <div class="section-inner">
-        <div class="section-header">
-          <div class="section-number">04 / Analys — 3 av 4</div>
-          <h2>Stadsparken</h2>
-          <p class="subtitle">Stora Torget → Stadsparken · Least Cost Path</p>
-        </div>
-        <div class="section-body">
-          <div class="stat-row">
-            <div class="stat-box"><span class="value">4 556</span><span class="label">Total kostnad (LCP)</span></div>
+          <div class="lcp-block" data-lcp="domkyrkan">
+            <h3 class="lcp-dest-title" style="color:#c0392b">Domkyrkan</h3>
+            <p class="subtitle">Stora Torget → Domkyrkan</p>
+            <div class="stat-row">
+              <div class="stat-box"><span class="value">57 172</span><span class="label">Total kostnad (LCP)</span></div>
+            </div>
+            <ul class="info-list">
+              <li><span>LCP-rutt</span><span class="tag" style="color:#c0392b">Heldragen, röd</span></li>
+              <li><span>Kortaste väg</span><span class="tag" style="color:#888">Streckad, grå</span></li>
+            </ul>
+            <p>Den höga totalkostnaden speglar de branta och stenbelagda gatorna kring domkyrkan — ett av stadens tydligaste tillgänglighetshinder.</p>
           </div>
-          <ul class="info-list">
-            <li><span>LCP-rutt</span><span class="tag" style="color:#27ae60">Heldragen, grön</span></li>
-            <li><span>Kortaste väg</span><span class="tag" style="color:#888">Streckad, grå</span></li>
-          </ul>
-          <p>Relativt låg totalkostnad — rutten går till stor del längs tillgängliga gator med asfalt och låg lutning.</p>
-        </div>
-      </div>
-    </section>
 
-    <!-- 4d. LCP → Vaksala torg -->
-    <section class="section dimmed" data-section="lcp-vaksala">
-      <div class="section-inner">
-        <div class="section-header">
-          <div class="section-number">04 / Analys — 4 av 4</div>
-          <h2>Vaksala torg</h2>
-          <p class="subtitle">Stora Torget → Vaksala torg · Least Cost Path</p>
-        </div>
-        <div class="section-body">
-          <div class="stat-row">
-            <div class="stat-box"><span class="value">2 269</span><span class="label">Total kostnad (LCP)</span></div>
+          <div class="lcp-block" data-lcp="stadsparken">
+            <h3 class="lcp-dest-title" style="color:#27ae60">Stadsparken</h3>
+            <p class="subtitle">Stora Torget → Stadsparken</p>
+            <div class="stat-row">
+              <div class="stat-box"><span class="value">4 556</span><span class="label">Total kostnad (LCP)</span></div>
+            </div>
+            <ul class="info-list">
+              <li><span>LCP-rutt</span><span class="tag" style="color:#27ae60">Heldragen, grön</span></li>
+              <li><span>Kortaste väg</span><span class="tag" style="color:#888">Streckad, grå</span></li>
+            </ul>
+            <p>Relativt låg totalkostnad — rutten går till stor del längs tillgängliga gator med asfalt och låg lutning.</p>
           </div>
-          <ul class="info-list">
-            <li><span>LCP-rutt</span><span class="tag" style="color:#5bb5c4">Heldragen, teal</span></li>
-            <li><span>Kortaste väg</span><span class="tag" style="color:#888">Streckad, grå</span></li>
-          </ul>
-          <p>Lägst totalkostnad av alla destinationer. Vaksala torg nås via relativt plana och välbelagda gator norr om Stora Torget.</p>
+
+          <div class="lcp-block" data-lcp="vaksala">
+            <h3 class="lcp-dest-title" style="color:#5bb5c4">Vaksala torg</h3>
+            <p class="subtitle">Stora Torget → Vaksala torg</p>
+            <div class="stat-row">
+              <div class="stat-box"><span class="value">2 269</span><span class="label">Total kostnad (LCP)</span></div>
+            </div>
+            <ul class="info-list">
+              <li><span>LCP-rutt</span><span class="tag" style="color:#5bb5c4">Heldragen, teal</span></li>
+              <li><span>Kortaste väg</span><span class="tag" style="color:#888">Streckad, grå</span></li>
+            </ul>
+            <p>Lägst totalkostnad av alla destinationer. Vaksala torg nås via relativt plana och välbelagda gator norr om Stora Torget.</p>
+          </div>
         </div>
       </div>
     </section>
@@ -907,21 +906,19 @@
 
   // ── Section configs ──
   const SECTION_VIEWS = {
-    intro:           { center: [17.638, 59.858], zoom: 13,   pitch: 0, bearing: 0, duration: 2000 },
-    vaglutning:      { center: [17.640, 59.860], zoom: 14,   pitch: 0, bearing: 0, duration: 2000 },
-    vagunderlag:     { center: [17.635, 59.856], zoom: 14.5, pitch: 0, bearing: 0, duration: 2000 },
-    'lcp-carolina':  { center: [17.639, 59.857], zoom: 14,   pitch: 0, bearing: 0, duration: 2000 },
-    'lcp-domkyrkan': { center: [17.638, 59.858], zoom: 14,   pitch: 0, bearing: 0, duration: 2000 },
-    'lcp-stadsparken':{ center: [17.638, 59.857], zoom: 14,  pitch: 0, bearing: 0, duration: 2000 },
-    'lcp-vaksala':   { center: [17.638, 59.860], zoom: 14,   pitch: 0, bearing: 0, duration: 2000 },
-    anlaggning:      { center: [17.638, 59.858], zoom: 13.5, pitch: 0, bearing: 0, duration: 2000 },
-    sammanfattning:  { center: [17.638, 59.858], zoom: 13,   pitch: 0, bearing: 0, duration: 2000 }
+    intro:          { center: [17.638, 59.858], zoom: 13,   pitch: 0, bearing: 0, duration: 2000 },
+    vaglutning:     { center: [17.640, 59.860], zoom: 14,   pitch: 0, bearing: 0, duration: 2000 },
+    vagunderlag:    { center: [17.635, 59.856], zoom: 14.5, pitch: 0, bearing: 0, duration: 2000 },
+    lcp:            { center: [17.638, 59.858], zoom: 14,   pitch: 0, bearing: 0, duration: 2000 },
+    anlaggning:     { center: [17.638, 59.858], zoom: 13.5, pitch: 0, bearing: 0, duration: 2000 },
+    sammanfattning: { center: [17.638, 59.858], zoom: 13,   pitch: 0, bearing: 0, duration: 2000 }
   };
 
   const SECTION_LABELS = {
     intro:             'Överblick — Uppsala innerstad',
     vaglutning:        'Analys — Väglutning',
     vagunderlag:       'Analys — Vägunderlag',
+    lcp:               'Analys — Least Cost Path',
     'lcp-carolina':    'LCP → Carolina Rediviva',
     'lcp-domkyrkan':   'LCP → Domkyrkan',
     'lcp-stadsparken': 'LCP → Stadsparken',
@@ -930,7 +927,7 @@
     sammanfattning:    'Sammanfattning'
   };
 
-  const SECTION_ORDER = ['intro', 'vaglutning', 'vagunderlag', 'lcp-carolina', 'lcp-domkyrkan', 'lcp-stadsparken', 'lcp-vaksala', 'anlaggning', 'sammanfattning'];
+  const SECTION_ORDER = ['intro', 'vaglutning', 'vagunderlag', 'lcp', 'anlaggning', 'sammanfattning'];
 
   // ── Layer definitions (lazy-loaded) ──
   // sourceId: which GeoJSON source to use (shared where possible)
@@ -1133,6 +1130,7 @@
     intro:             ['innerstad', 'poi-labels', 'poi-stora-torget-label'],
     vaglutning:        ['amcoff', 'innerstad', 'poi-labels', 'poi-stora-torget-label'],
     vagunderlag:       ['amcoff-surface', 'innerstad', 'poi-labels', 'poi-stora-torget-label'],
+    lcp:               ['lcp-carolina', 'shortest-carolina', ...POI_LAYERS],  // default: Carolina
     'lcp-carolina':    ['lcp-carolina',    'shortest-carolina',    ...POI_LAYERS],
     'lcp-domkyrkan':   ['lcp-domkyrkan',   'shortest-domkyrkan',   ...POI_LAYERS],
     'lcp-stadsparken': ['lcp-stadsparken', 'shortest-stadsparken', ...POI_LAYERS],
@@ -1349,17 +1347,14 @@
   document.getElementById('progress-nav').addEventListener('click', e => {
     const dot = e.target.closest('.progress-dot');
     if (!dot) return;
-    // lcp-pricken scrollar till första LCP-delsektionen
-    const target = dot.dataset.target === 'lcp' ? 'lcp-carolina' : dot.dataset.target;
-    const el = document.querySelector('[data-section="' + target + '"]');
+    const el = document.querySelector('[data-section="' + dot.dataset.target + '"]');
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
   // Hjälpfunktion: uppdatera progress-nav prickar
   function updateProgressNav(section) {
-    const navSection = section.startsWith('lcp-') ? 'lcp' : section;
     document.querySelectorAll('.progress-dot').forEach(dot => {
-      dot.classList.toggle('active', dot.dataset.target === navSection);
+      dot.classList.toggle('active', dot.dataset.target === section);
     });
   }
 
@@ -1429,9 +1424,27 @@
         transitionToSection(section);
         renderLegend(section);
       });
-    }, { threshold: 0.4 });
+    }, { threshold: 0.1 });
 
     document.querySelectorAll('[data-section]').forEach(s => observer.observe(s));
+
+    // ── LCP-block observer: byter karta + legend när varje destination scrollas in ──
+    const lcpObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting || activeSection !== 'lcp') return;
+        const key = 'lcp-' + entry.target.dataset.lcp;
+        transitionToSection(key);
+        const labelEl = document.getElementById('section-label');
+        labelEl.style.opacity = '0';
+        setTimeout(() => {
+          labelEl.textContent = SECTION_LABELS[key] || '';
+          labelEl.style.opacity = '1';
+        }, 200);
+        renderLegend(key);
+      });
+    }, { threshold: 0.5, root: textCol });
+
+    document.querySelectorAll('[data-lcp]').forEach(el => lcpObserver.observe(el));
   });
 </script>
 
