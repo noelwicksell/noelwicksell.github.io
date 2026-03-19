@@ -27,13 +27,15 @@
       --text-muted:   rgba(26,39,68,0.65);
     }
 
-    html { scroll-behavior: smooth; }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
 
     body {
       font-family: 'Inter', sans-serif;
       background: linear-gradient(160deg, var(--bg), var(--bg-mid));
       color: var(--text);
-      min-height: 100vh;
     }
 
     /* ── Layout ── */
@@ -827,32 +829,6 @@
 
 </div><!-- /app -->
 
-<!-- ── Footer ── -->
-<footer class="site-footer" role="contentinfo">
-  <div class="footer-grid">
-    <div>
-      <h3>Grupp 4</h3>
-      <p style="color:rgba(255,255,255,0.85);margin:0">
-        Axel Edlund<br>
-        Isak Karlsson<br>
-        Simon Normelius<br>
-        Noel Wicksell
-      </p>
-    </div>
-    <div>
-      <h3>Kurs &amp; institution</h3>
-      <p style="color:rgba(255,255,255,0.85);margin:0">
-        GIS 2 · Uppsala universitet<br>
-        Kulturgeografiska institutionen<br>
-        Vårterminen 2025
-      </p>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <span>© 2025 Grupp 4 · Uppsala universitet</span>
-    <span>Data: Lantmäteriet · Trafikverket · Silver Ways · Wheelmap / OSM</span>
-  </div>
-</footer>
 
 <script>
   // ── Map setup ──
@@ -883,6 +859,24 @@
 
   map.scrollZoom.disable();
   map.addControl(new maplibregl.NavigationControl({ showCompass: true }), 'top-right');
+
+  // ── Redirect all wheel-scroll to #text-col ──
+  const textCol = document.getElementById('text-col');
+  document.addEventListener('wheel', e => {
+    e.preventDefault();
+    textCol.scrollBy({ top: e.deltaY, behavior: 'auto' });
+  }, { passive: false });
+
+  // Touch scroll: redirect touch on map to text-col
+  let touchStartY = 0;
+  document.getElementById('map-col').addEventListener('touchstart', e => {
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  document.getElementById('map-col').addEventListener('touchmove', e => {
+    const dy = touchStartY - e.touches[0].clientY;
+    touchStartY = e.touches[0].clientY;
+    textCol.scrollBy({ top: dy, behavior: 'auto' });
+  }, { passive: true });
 
   // ── Section configs ──
   const SECTION_VIEWS = {
