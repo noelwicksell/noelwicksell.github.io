@@ -486,6 +486,20 @@
     .lcp-panel { display: none; }
     .lcp-panel.active { display: block; }
 
+    .sam-tabs { display: flex; gap: 5px; margin-bottom: 18px; flex-wrap: wrap; }
+    .sam-tab-btn {
+      flex: 1; min-width: 80px; padding: 7px 10px;
+      border: 1.5px solid var(--glass-border); border-radius: 8px;
+      background: rgba(255,255,255,0.3); color: var(--text-muted);
+      font-size: 0.72rem; font-weight: 600; cursor: pointer;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
+      text-align: center; font-family: 'Inter', sans-serif; line-height: 1.3;
+    }
+    .sam-tab-btn:hover { background: rgba(255,255,255,0.55); color: var(--text); }
+    .sam-tab-btn.active { background: var(--tab-color, var(--navy)); color: #fff; border-color: var(--tab-color, var(--navy)); }
+    .sam-panel { display: none; }
+    .sam-panel.active { display: block; }
+
     .no-data-note {
       font-size: 0.78rem;
       color: #c0392b;
@@ -794,9 +808,20 @@
           <div class="section-number">06 / Slutsats</div>
           <h2>Sammanfattning &amp; diskussion</h2>
           <p class="subtitle">Vad visar analyserna — och vad saknas?</p>
+          <div class="sam-tabs" role="tablist" aria-label="Sammanfattning-lager">
+            <button class="sam-tab-btn active" data-samlayer="sam-lutning"  style="--tab-color:#5bb5c4">Lutning</button>
+            <button class="sam-tab-btn"        data-samlayer="sam-shortest" style="--tab-color:#1a2744">Kortaste linjer</button>
+          </div>
         </div>
         <div class="section-body">
           <p>Analyserna visar att Uppsala innerstad har stora variationer i tillgänglighet för rullstolsanvändare. Historiska gatumiljöer med gatsten och kuperade partier nära slottsbacken utgör de tydligaste hindren.</p>
+
+          <div class="sam-panel active" data-sampanel="sam-lutning">
+            <p>Kartan visar Amcoff-nätets vägsegment färgsatta efter <strong>lutning</strong>. Branta partier nära slottsbacken och längs Svartbäcksgatan ger tydliga hinder för rullstolsanvändare.</p>
+          </div>
+          <div class="sam-panel" data-sampanel="sam-shortest">
+            <p>Kartan visar de <strong>kortaste linjerna</strong> i Amcoff-nätet — euklidiska direktlinjer som illustrerar hur stora omvägarna i LCP-rutterna faktiskt är.</p>
+          </div>
 
           <p>LCP-rutterna avviker markant från de kortaste vägarna i flera fall, vilket visar att optimal framkomlighet kräver omvägar för att undvika branta eller ojämna partier.</p>
 
@@ -892,34 +917,58 @@
     setTimeout(() => { labelEl.textContent = SECTION_LABELS[key] || ''; labelEl.style.opacity = '1'; }, 200);
   }
 
-  // ── Wheel: LCP-sektionen cyklar destinations, annars scroll-snap ──
-  let scrollAccum = 0;
-  let scrollTimer = null;
+  // ── Sammanfattning layer cycling ──
+  const SAM_LAYERS = ['sam-lutning', 'sam-shortest'];
+  let activeSamLayer = 'sam-lutning';
+
+  function switchSamLayer(layer) {
+    activeSamLayer = layer;
+    document.querySelectorAll('.sam-tab-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.samlayer === layer));
+    document.querySelectorAll('.sam-panel').forEach(p =>
+      p.classList.toggle('active', p.dataset.sampanel === layer));
+    transitionToSection(layer);
+    renderLegend(layer);
+    const labelEl = document.getElementById('section-label');
+    labelEl.style.opacity = '0';
+    setTimeout(() => { labelEl.textContent = SECTION_LABELS['sammanfattning'] || ''; labelEl.style.opacity = '1'; }, 200);
+  }
+
+  // ── Wheel: LCP/sammanfattning cyklar lager, annars scroll-snap ──
+  let scrollLocked = false;
 
   document.addEventListener('wheel', e => {
     e.preventDefault();
-    clearTimeout(scrollTimer);
-    scrollTimer = setTimeout(() => { scrollAccum = 0; }, 400);
 
     if (activeSection === 'lcp') {
-      scrollAccum += e.deltaY;
-      if (scrollAccum > 180) {
-        scrollAccum = 0;
-        const idx = LCP_DESTS.indexOf(activeLcpDest);
-        if (idx < LCP_DESTS.length - 1) {
-          switchLcpDest(LCP_DESTS[idx + 1]);
-        } else {
-          textCol.scrollBy({ top: window.innerHeight * 1.5, behavior: 'smooth' });
-        }
-      } else if (scrollAccum < -180) {
-        scrollAccum = 0;
-        const idx = LCP_DESTS.indexOf(activeLcpDest);
-        if (idx > 0) {
-          switchLcpDest(LCP_DESTS[idx - 1]);
-        } else {
-          textCol.scrollBy({ top: -window.innerHeight * 1.5, behavior: 'smooth' });
-        }
+      if (scrollLocked) return;
+      const forward = e.deltaY > 0;
+      const idx = LCP_DESTS.indexOf(activeLcpDest);
+      if (forward) {
+        if (idx < LCP_DESTS.length - 1) switchLcpDest(LCP_DESTS[idx + 1]);
+        else textCol.scrollBy({ top: window.innerHeight * 1.5, behavior: 'smooth' });
+      } else {
+        if (idx > 0) switchLcpDest(LCP_DESTS[idx - 1]);
+        else textCol.scrollBy({ top: -window.innerHeight * 1.5, behavior: 'smooth' });
       }
+      scrollLocked = true;
+      setTimeout(() => { scrollLocked = false; }, 600);
+      return;
+    }
+
+    if (activeSection === 'sammanfattning') {
+      if (scrollLocked) return;
+      const forward = e.deltaY > 0;
+      const idx = SAM_LAYERS.indexOf(activeSamLayer);
+      if (forward) {
+        if (idx < SAM_LAYERS.length - 1) switchSamLayer(SAM_LAYERS[idx + 1]);
+        else textCol.scrollBy({ top: window.innerHeight * 1.5, behavior: 'smooth' });
+      } else {
+        if (idx > 0) switchSamLayer(SAM_LAYERS[idx - 1]);
+        else textCol.scrollBy({ top: -window.innerHeight * 1.5, behavior: 'smooth' });
+      }
+      scrollLocked = true;
+      setTimeout(() => { scrollLocked = false; }, 600);
       return;
     }
 
@@ -1151,9 +1200,31 @@
       }
     }
 
-    // TODO: Lägg till väglutningslager (slope) när data exporterats från QGIS.
-    //       Önskad styling: 'line-color': ['step', ['get', 'slope_pct'], '#27ae60', 2, '#f39c12', 4, '#c0392b']
-    // TODO: Lägg till KDE raster-overlay för anläggningsanalysen.
+    // ── Sammanfattning lager 1: Amcoff lutning ──
+    {
+      id: 'sam-lutning', sourceId: 'sam-lutning', file: 'data/amcoff_lutning.geojson',
+      type: 'line',
+      paint: {
+        'line-color': '#5bb5c4',
+        'line-width': 1.5,
+        'line-opacity': 0,
+        'line-opacity-transition': { duration: 400, delay: 0 }
+      },
+      layout: { 'line-join': 'round', visibility: 'none' }
+    },
+
+    // ── Sammanfattning lager 2: Amcoff kortaste linjer ──
+    {
+      id: 'sam-shortest', sourceId: 'sam-shortest', file: 'data/amcoff_shortest_lines.geojson',
+      type: 'line',
+      paint: {
+        'line-color': '#1a2744',
+        'line-width': 1.5,
+        'line-opacity': 0,
+        'line-opacity-transition': { duration: 400, delay: 0 }
+      },
+      layout: { 'line-join': 'round', visibility: 'none' }
+    }
   ];
 
   // ── Vilka lager visas per sektion ──
@@ -1169,16 +1240,12 @@
     'lcp-stadsparken': ['lcp-stadsparken', 'shortest-stadsparken', ...POI_LAYERS],
     'lcp-vaksala':     ['lcp-vaksala',     'shortest-vt',          ...POI_LAYERS],
     anlaggning:        [...POI_LAYERS],
-    sammanfattning:    ['lcp-carolina', 'lcp-domkyrkan', 'lcp-stadsparken', 'lcp-vaksala', ...POI_LAYERS]
+    sammanfattning:    ['sam-lutning', ...POI_LAYERS],  // default: lager 1
+    'sam-lutning':     ['sam-lutning',  'innerstad'],
+    'sam-shortest':    ['sam-shortest', 'innerstad']
   };
 
-  // Reducerad opacity för sammanfattningssektionen
-  const SECTION_OPACITY = {
-    sammanfattning: {
-      'lcp-carolina': 0.45, 'lcp-domkyrkan': 0.45, 'lcp-stadsparken': 0.45, 'lcp-vaksala': 0.45,
-      'poi': 0.7, 'poi-labels': 0.7, 'poi-stora-torget': 0.7, 'poi-stora-torget-label': 0.7
-    }
-  };
+  const SECTION_OPACITY = {};
 
   // ── Legend-konfigurationer ──
   const LEGENDS = {
@@ -1255,14 +1322,16 @@
       ]
     },
 
-    sammanfattning: {
-      title: 'Sammanfattning',
+    'sam-lutning': {
+      title: 'Amcoff-nät — Lutning',
       items: [
-        { type: 'line',   color: '#1a2744', label: 'LCP → Carolina Rediviva', style: 'solid' },
-        { type: 'line',   color: '#c0392b', label: 'LCP → Domkyrkan',         style: 'solid' },
-        { type: 'line',   color: '#27ae60', label: 'LCP → Stadsparken',       style: 'solid' },
-        { type: 'line',   color: '#5bb5c4', label: 'LCP → Vaksala torg',      style: 'solid' },
-        { type: 'circle', color: '#1a2744', label: 'Destinationer'            }
+        { type: 'line', color: '#5bb5c4', label: 'Vägsegment (lutning)', style: 'solid' }
+      ]
+    },
+    'sam-shortest': {
+      title: 'Amcoff-nät — Kortaste linjer',
+      items: [
+        { type: 'line', color: '#1a2744', label: 'Kortaste linje', style: 'solid' }
       ]
     }
   };
@@ -1456,6 +1525,8 @@
 
         if (section === 'lcp') {
           switchLcpDest(activeLcpDest);
+        } else if (section === 'sammanfattning') {
+          switchSamLayer(activeSamLayer);
         } else {
           transitionToSection(section);
           renderLegend(section);
@@ -1468,6 +1539,11 @@
     // ── LCP tab-knappar: klick byter destination ──
     document.querySelectorAll('.lcp-tab-btn').forEach(btn => {
       btn.addEventListener('click', () => switchLcpDest(btn.dataset.dest));
+    });
+
+    // ── Sammanfattning tab-knappar: klick byter lager ──
+    document.querySelectorAll('.sam-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchSamLayer(btn.dataset.samlayer));
     });
   });
 </script>
