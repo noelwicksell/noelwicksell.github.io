@@ -569,7 +569,7 @@
   @media (max-width: 900px) {
     #swipe-hint {
       position: fixed;
-      bottom: 24px;
+      bottom: calc(40svh + 12px);
       left: 50%;
       transform: translateX(-50%);
       display: flex;
@@ -602,6 +602,54 @@
     @keyframes swipe-bounce {
       0%, 100% { transform: translateY(0); opacity: 0.7; }
       50% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    /* Map touch overlay */
+    #map-touch-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      cursor: pointer;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 14px;
+    }
+    #map-touch-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(27,51,73,0.72);
+      backdrop-filter: blur(4px);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 20px;
+      pointer-events: none;
+    }
+    #map-exit-explore {
+      display: none;
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      background: var(--navy);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      white-space: nowrap;
     }
   }
   </style>
@@ -791,6 +839,13 @@
 
   <main id="map-col">
     <div id="map" role="application" aria-label="Interaktiv karta över Uppsala innerstad"></div>
+    <div id="map-touch-overlay" aria-hidden="true">
+      <span id="map-touch-label">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M7 1C4.239 1 2 3.239 2 6s2.239 5 5 5 5-2.239 5-5-2.239-5-5-5zm0 9a4 4 0 110-8 4 4 0 010 8z" fill="white" opacity=".8"/><circle cx="7" cy="6" r="1.5" fill="white"/></svg>
+        Tryck för att styra kartan
+      </span>
+    </div>
+    <button id="map-exit-explore" aria-label="Avsluta kartläge">✕ Avsluta kartläge</button>
     <div id="section-label">Överblick — Uppsala innerstad</div>
     <div id="legend" class="mobile-hidden"></div>
     <button id="legend-toggle" aria-label="Visa/dölj teckenförklaring">
@@ -1003,6 +1058,43 @@
       dismissHint();
       document.removeEventListener('touchend', onFirstSwipe);
     }, { passive: true, once: true });
+  })();
+
+  // ── Mobile map interaction lock ──
+  (function() {
+    if (!window.matchMedia('(max-width: 900px)').matches) return;
+
+    map.dragPan.disable();
+    map.touchZoomRotate.disable();
+
+    const mapCol  = document.getElementById('map-col');
+    const overlay = document.getElementById('map-touch-overlay');
+    const exitBtn = document.getElementById('map-exit-explore');
+
+    overlay.style.display = 'flex';
+
+    let exploreMode = false;
+
+    // Prevent swipe-navigation events from firing while in explore mode
+    function stopIfExplore(e) { if (exploreMode) e.stopPropagation(); }
+    mapCol.addEventListener('touchstart', stopIfExplore, { passive: true });
+    mapCol.addEventListener('touchend',   stopIfExplore, { passive: true });
+
+    overlay.addEventListener('click', () => {
+      exploreMode = true;
+      map.dragPan.enable();
+      map.touchZoomRotate.enable();
+      overlay.style.display = 'none';
+      exitBtn.style.display = 'block';
+    });
+
+    exitBtn.addEventListener('click', () => {
+      exploreMode = false;
+      map.dragPan.disable();
+      map.touchZoomRotate.disable();
+      overlay.style.display = 'flex';
+      exitBtn.style.display = 'none';
+    });
   })();
 
   // ── Section configs ──
