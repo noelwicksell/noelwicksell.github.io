@@ -721,8 +721,8 @@
           </div>
           <ul class="info-list">
             <li><span>LCP-rutt</span><span class="tag" style="color:#c0392b">Heldragen, röd</span></li>
+            <li><span>Kortaste väg</span><span class="tag" style="color:#888">Streckad, grå</span></li>
           </ul>
-          <div class="no-data-note">⚠ Kortaste väg saknas för denna destination — exportera från QGIS för att möjliggöra jämförelse.</div>
           <p>Den höga totalkostnaden (57 172) speglar de branta och stenbelagda gatorna kring domkyrkan, som utgör ett av stadens tydligaste tillgänglighetshinder.</p>
         </div>
 
@@ -735,8 +735,8 @@
           </div>
           <ul class="info-list">
             <li><span>LCP-rutt</span><span class="tag" style="color:#27ae60">Heldragen, grön</span></li>
+            <li><span>Kortaste väg</span><span class="tag" style="color:#888">Streckad, grå</span></li>
           </ul>
-          <div class="no-data-note">⚠ Kortaste väg saknas för denna destination — exportera från QGIS för att möjliggöra jämförelse.</div>
           <p>Stadsparken har relativt låg totalkostnad (4 556), vilket indikerar att rutten till stor del går längs tillgängliga gator med asfalt och låg lutning.</p>
         </div>
 
@@ -933,30 +933,48 @@
       layout: { 'line-join': 'round', 'line-cap': 'round', visibility: 'none' }
     },
 
-    // ── Kortaste väg (jämförelse, streckad) ──
-    // NOTE: shortest_st_carolina.geojson och shortest_st_vt.geojson saknar properties ({}).
-    // Styling är enbart visuell — ingen data-driven färgkodning möjlig.
+    // ── Kortaste väg (jämförelse, streckad) — alla 4 destinationer ──
     {
-      id: 'shortest-carolina', sourceId: 'shortest-carolina', file: 'data/shortest_st_carolina.geojson',
+      id: 'shortest-carolina',    sourceId: 'shortest-carolina',    file: 'data/shortest_st_carolina.geojson',
       type: 'line',
       paint: { 'line-color': '#888888', 'line-width': 2.5, 'line-dasharray': [5, 3], 'line-opacity': 0, 'line-opacity-transition': { duration: 400, delay: 0 } },
       layout: { 'line-join': 'round', visibility: 'none' }
     },
     {
-      id: 'shortest-vt',       sourceId: 'shortest-vt',       file: 'data/shortest_st_vt.geojson',
+      id: 'shortest-vt',          sourceId: 'shortest-vt',          file: 'data/shortest_st_vt.geojson',
+      type: 'line',
+      paint: { 'line-color': '#888888', 'line-width': 2.5, 'line-dasharray': [5, 3], 'line-opacity': 0, 'line-opacity-transition': { duration: 400, delay: 0 } },
+      layout: { 'line-join': 'round', visibility: 'none' }
+    },
+    {
+      id: 'shortest-domkyrkan',   sourceId: 'shortest-domkyrkan',   file: 'data/shortest_st_domkyrkan.geojson',
+      type: 'line',
+      paint: { 'line-color': '#888888', 'line-width': 2.5, 'line-dasharray': [5, 3], 'line-opacity': 0, 'line-opacity-transition': { duration: 400, delay: 0 } },
+      layout: { 'line-join': 'round', visibility: 'none' }
+    },
+    {
+      id: 'shortest-stadsparken', sourceId: 'shortest-stadsparken', file: 'data/shortest_st_stadsparken.geojson',
       type: 'line',
       paint: { 'line-color': '#888888', 'line-width': 2.5, 'line-dasharray': [5, 3], 'line-opacity': 0, 'line-opacity-transition': { duration: 400, delay: 0 } },
       layout: { 'line-join': 'round', visibility: 'none' }
     },
 
-    // ── Amcoff vägunderlag ──
-    // NOTE: amcoff_shortest_lines.geojson har tomma properties ({}).
-    // TODO: Re-exportera från QGIS med attributen surface_type och cost för data-driven färgkodning.
-    //       Önskad styling: färgskala baserad på friktionskostnad (asfalt=grön, gatsten=röd m.m.)
+    // ── Amcoff väglutning (slope-färgkodning) ──
+    // Färgskala: 0-2% grön, 2-4% orange, >4% röd (kritisk gräns för rullstol)
     {
-      id: 'amcoff', sourceId: 'amcoff', file: 'data/amcoff_shortest_lines.geojson',
+      id: 'amcoff', sourceId: 'amcoff', file: 'data/amcoff_surface.geojson',
       type: 'line',
-      paint: { 'line-color': '#e67e22', 'line-width': 1.5, 'line-opacity': 0, 'line-opacity-transition': { duration: 400, delay: 0 } },
+      paint: {
+        'line-color': [
+          'step', ['get', 'slope'],
+          '#27ae60',   2,
+          '#f39c12',   4,
+          '#c0392b'
+        ],
+        'line-width': 2,
+        'line-opacity': 0,
+        'line-opacity-transition': { duration: 400, delay: 0 }
+      },
       layout: { 'line-join': 'round', visibility: 'none' }
     },
 
@@ -1047,8 +1065,7 @@
   // ── Vilka lager visas per sektion ──
   const SECTION_LAYERS = {
     intro:          [],
-    // TODO: Ersätt [] med väglutningslager när GeoJSON med slope-attribut finns
-    vaglutning:     [],
+    vaglutning:     ['amcoff'],
     vagunderlag:    ['amcoff'],
     lcp:            ['lcp-carolina', 'lcp-domkyrkan', 'lcp-stadsparken', 'lcp-vaksala',
                      'shortest-carolina', 'shortest-vt',
@@ -1070,14 +1087,12 @@
   const LEGENDS = {
     intro: null,
 
-    // TODO: Fyll i items med riktig lutningsskala när väglutningsdata finns
     vaglutning: {
       title: 'Väglutning',
-      note: 'Saknar data — exportera slope-lager från QGIS med lutning i procent som attribut',
       items: [
         { type: 'line', color: '#27ae60', label: '0–2 % (tillgänglig)', style: 'solid' },
         { type: 'line', color: '#f39c12', label: '2–4 % (begränsad)',   style: 'solid' },
-        { type: 'line', color: '#c0392b', label: '> 4 % (kritisk)',     style: 'solid' }
+        { type: 'line', color: '#c0392b', label: '> 4 % (otillgänglig)', style: 'solid' }
       ]
     },
 
@@ -1133,10 +1148,10 @@
 
   // ── LCP tab config ──
   const LCP_TABS = {
-    carolina:    { lcpLayer: 'lcp-carolina',    shortestLayer: 'shortest-carolina', color: '#1a2744', dest: 'Carolina Rediviva' },
-    domkyrkan:   { lcpLayer: 'lcp-domkyrkan',   shortestLayer: null,                color: '#c0392b', dest: 'Domkyrkan'         },
-    stadsparken: { lcpLayer: 'lcp-stadsparken', shortestLayer: null,                color: '#27ae60', dest: 'Stadsparken'       },
-    vaksala:     { lcpLayer: 'lcp-vaksala',     shortestLayer: 'shortest-vt',       color: '#5bb5c4', dest: 'Vaksala torg'      }
+    carolina:    { lcpLayer: 'lcp-carolina',    shortestLayer: 'shortest-carolina',    color: '#1a2744', dest: 'Carolina Rediviva' },
+    domkyrkan:   { lcpLayer: 'lcp-domkyrkan',   shortestLayer: 'shortest-domkyrkan',   color: '#c0392b', dest: 'Domkyrkan'         },
+    stadsparken: { lcpLayer: 'lcp-stadsparken', shortestLayer: 'shortest-stadsparken', color: '#27ae60', dest: 'Stadsparken'       },
+    vaksala:     { lcpLayer: 'lcp-vaksala',     shortestLayer: 'shortest-vt',          color: '#5bb5c4', dest: 'Vaksala torg'      }
   };
 
   // ── State ──
@@ -1214,7 +1229,7 @@
 
     const allLcpLayers = [
       'lcp-carolina', 'lcp-domkyrkan', 'lcp-stadsparken', 'lcp-vaksala',
-      'shortest-carolina', 'shortest-vt'
+      'shortest-carolina', 'shortest-vt', 'shortest-domkyrkan', 'shortest-stadsparken'
     ];
     allLcpLayers.forEach(id => {
       if (!tabLayers.includes(id)) hideLayer(id);
