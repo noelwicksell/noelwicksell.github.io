@@ -861,7 +861,7 @@
     const el = document.querySelector('[data-section="' + key + '"]');
     if (!el) return;
     if (window.innerWidth <= 900) {
-      textCol.scrollTop = el.offsetTop;
+      textCol.scrollTop = el.offsetTop - textCol.offsetTop;
       activateSection(key);
     } else {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
