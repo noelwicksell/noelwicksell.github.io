@@ -798,12 +798,13 @@
   }, { passive: true });
 
   // ── Section configs ──
+  // bounds: [[west, south], [east, north]] — fitBounds calculates zoom automatically per viewport size
   const SECTION_VIEWS = {
-    intro:       { center: [17.638, 59.858], zoom: 13,   pitch: 0, bearing: 0, duration: 2000 },
-    vaglutning:  { center: [17.640, 59.860], zoom: 14,   pitch: 0, bearing: 0, duration: 2000 },
-    vagunderlag: { center: [17.635, 59.856], zoom: 14.5, pitch: 0, bearing: 0, duration: 2000 },
-    lcp:         { center: [17.638, 59.858], zoom: 14,   pitch: 0, bearing: 0, duration: 2000 },
-    anlaggning:  { center: [17.638, 59.858], zoom: 13.5, pitch: 0, bearing: 0, duration: 2000 }
+    intro:       { bounds: [[17.614, 59.847], [17.662, 59.869]], padding: 32, pitch: 0, bearing: 0, duration: 2000 },
+    vaglutning:  { bounds: [[17.616, 59.847], [17.660, 59.869]], padding: 32, pitch: 0, bearing: 0, duration: 2000 },
+    vagunderlag: { bounds: [[17.616, 59.847], [17.660, 59.869]], padding: 32, pitch: 0, bearing: 0, duration: 2000 },
+    lcp:         { bounds: [[17.614, 59.847], [17.662, 59.869]], padding: 32, pitch: 0, bearing: 0, duration: 2000 },
+    anlaggning:  { bounds: [[17.617, 59.849], [17.657, 59.869]], padding: 32, pitch: 0, bearing: 0, duration: 2000 }
   };
 
   const SECTION_LABELS = {
@@ -1173,6 +1174,10 @@
 
   map.on('load', () => {
 
+    // Fit to intro bounds immediately so initial view matches viewport
+    const introView = SECTION_VIEWS['intro'];
+    map.fitBounds(introView.bounds, { padding: introView.padding, pitch: introView.pitch, bearing: introView.bearing, duration: 0 });
+
     Object.keys(LCP_DEST).forEach(id => {
       map.on('click', id, e => {
         const props = e.features[0].properties;
@@ -1213,7 +1218,8 @@
         if (section === activeSection) return;
         activeSection = section;
 
-        map.flyTo(SECTION_VIEWS[section]);
+        const v = SECTION_VIEWS[section];
+        map.fitBounds(v.bounds, { padding: v.padding, duration: v.duration, pitch: v.pitch, bearing: v.bearing });
 
         const labelEl = document.getElementById('section-label');
         labelEl.style.opacity = '0';
