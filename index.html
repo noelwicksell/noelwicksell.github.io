@@ -483,23 +483,8 @@
     .lcp-tab-panel { display: none; }
     .lcp-tab-panel.active { display: block; }
 
-    /* ── LCP scroll-block per destination ── */
-    .lcp-block {
-      min-height: 80vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 40px 0;
-      border-top: 1px solid var(--glass-border);
-    }
-
-    .lcp-block:first-child { border-top: none; }
-
-    .lcp-dest-title {
-      font-size: clamp(1.1rem, 2vw, 1.5rem);
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
+    .lcp-panel { display: none; }
+    .lcp-panel.active { display: block; }
 
     .no-data-note {
       font-size: 0.78rem;
@@ -720,11 +705,17 @@
           <p class="subtitle">Multikriterieanalys: lutning + underlag</p>
         </div>
         <div class="section-body">
-          <p>En <strong>Least Cost Path (LCP)</strong>-analys identifierar den rutt med lägst samlad kostnad — inte den kortaste sträckan, utan den mest framkomliga för rullstol. Scrolla för att se varje destination.</p>
+          <p>En <strong>Least Cost Path (LCP)</strong>-analys identifierar den rutt med lägst samlad kostnad — inte den kortaste sträckan, utan den mest framkomliga för rullstol.</p>
 
-          <div class="lcp-block" data-lcp="carolina">
-            <h3 class="lcp-dest-title" style="color:#1a2744">Carolina Rediviva</h3>
-            <p class="subtitle">Stora Torget → Carolina Rediviva</p>
+          <div class="lcp-tabs" role="tablist" aria-label="LCP-destinationer">
+            <button class="lcp-tab-btn active" data-dest="carolina"    style="--tab-color:#1a2744">Carolina Rediviva</button>
+            <button class="lcp-tab-btn"        data-dest="domkyrkan"   style="--tab-color:#c0392b">Domkyrkan</button>
+            <button class="lcp-tab-btn"        data-dest="stadsparken" style="--tab-color:#27ae60">Stadsparken</button>
+            <button class="lcp-tab-btn"        data-dest="vaksala"     style="--tab-color:#5bb5c4">Vaksala torg</button>
+          </div>
+
+          <div class="lcp-panel active" data-panel="carolina">
+            <p class="subtitle" style="color:#1a2744">Stora Torget → Carolina Rediviva</p>
             <div class="stat-row">
               <div class="stat-box"><span class="value">12 324</span><span class="label">Total kostnad (LCP)</span></div>
             </div>
@@ -735,9 +726,8 @@
             <p>LCP-rutten avviker från kortaste vägen för att undvika branta eller ojämna partier. Avvikelsen visar var tillgänglighetshinder finns.</p>
           </div>
 
-          <div class="lcp-block" data-lcp="domkyrkan">
-            <h3 class="lcp-dest-title" style="color:#c0392b">Domkyrkan</h3>
-            <p class="subtitle">Stora Torget → Domkyrkan</p>
+          <div class="lcp-panel" data-panel="domkyrkan">
+            <p class="subtitle" style="color:#c0392b">Stora Torget → Domkyrkan</p>
             <div class="stat-row">
               <div class="stat-box"><span class="value">57 172</span><span class="label">Total kostnad (LCP)</span></div>
             </div>
@@ -748,9 +738,8 @@
             <p>Den höga totalkostnaden speglar de branta och stenbelagda gatorna kring domkyrkan — ett av stadens tydligaste tillgänglighetshinder.</p>
           </div>
 
-          <div class="lcp-block" data-lcp="stadsparken">
-            <h3 class="lcp-dest-title" style="color:#27ae60">Stadsparken</h3>
-            <p class="subtitle">Stora Torget → Stadsparken</p>
+          <div class="lcp-panel" data-panel="stadsparken">
+            <p class="subtitle" style="color:#27ae60">Stora Torget → Stadsparken</p>
             <div class="stat-row">
               <div class="stat-box"><span class="value">4 556</span><span class="label">Total kostnad (LCP)</span></div>
             </div>
@@ -761,9 +750,8 @@
             <p>Relativt låg totalkostnad — rutten går till stor del längs tillgängliga gator med asfalt och låg lutning.</p>
           </div>
 
-          <div class="lcp-block" data-lcp="vaksala">
-            <h3 class="lcp-dest-title" style="color:#5bb5c4">Vaksala torg</h3>
-            <p class="subtitle">Stora Torget → Vaksala torg</p>
+          <div class="lcp-panel" data-panel="vaksala">
+            <p class="subtitle" style="color:#5bb5c4">Stora Torget → Vaksala torg</p>
             <div class="stat-row">
               <div class="stat-box"><span class="value">2 269</span><span class="label">Total kostnad (LCP)</span></div>
             </div>
@@ -884,12 +872,57 @@
   map.scrollZoom.disable();
   map.addControl(new maplibregl.NavigationControl({ showCompass: true }), 'top-right');
 
-  // ── Redirect wheel-scroll till #text-col ──
-  // På mobil scrollar #text-col direkt via touch — ingen redirect behövs.
   const textCol = document.getElementById('text-col');
+
+  // ── LCP destination cycling ──
+  const LCP_DESTS = ['carolina', 'domkyrkan', 'stadsparken', 'vaksala'];
+  let activeLcpDest = 'carolina';
+
+  function switchLcpDest(dest) {
+    activeLcpDest = dest;
+    const key = 'lcp-' + dest;
+    document.querySelectorAll('.lcp-tab-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.dest === dest));
+    document.querySelectorAll('.lcp-panel').forEach(p =>
+      p.classList.toggle('active', p.dataset.panel === dest));
+    transitionToSection(key);
+    renderLegend(key);
+    const labelEl = document.getElementById('section-label');
+    labelEl.style.opacity = '0';
+    setTimeout(() => { labelEl.textContent = SECTION_LABELS[key] || ''; labelEl.style.opacity = '1'; }, 200);
+  }
+
+  // ── Wheel: LCP-sektionen cyklar destinations, annars scroll-snap ──
+  let scrollAccum = 0;
+  let scrollTimer = null;
 
   document.addEventListener('wheel', e => {
     e.preventDefault();
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => { scrollAccum = 0; }, 400);
+
+    if (activeSection === 'lcp') {
+      scrollAccum += e.deltaY;
+      if (scrollAccum > 180) {
+        scrollAccum = 0;
+        const idx = LCP_DESTS.indexOf(activeLcpDest);
+        if (idx < LCP_DESTS.length - 1) {
+          switchLcpDest(LCP_DESTS[idx + 1]);
+        } else {
+          textCol.scrollBy({ top: window.innerHeight * 1.5, behavior: 'smooth' });
+        }
+      } else if (scrollAccum < -180) {
+        scrollAccum = 0;
+        const idx = LCP_DESTS.indexOf(activeLcpDest);
+        if (idx > 0) {
+          switchLcpDest(LCP_DESTS[idx - 1]);
+        } else {
+          textCol.scrollBy({ top: -window.innerHeight * 1.5, behavior: 'smooth' });
+        }
+      }
+      return;
+    }
+
     textCol.scrollBy({ top: e.deltaY, behavior: 'auto' });
   }, { passive: false });
 
@@ -1421,30 +1454,21 @@
           s.classList.toggle('dimmed', s.dataset.section !== section);
         });
 
-        transitionToSection(section);
-        renderLegend(section);
+        if (section === 'lcp') {
+          switchLcpDest(activeLcpDest);
+        } else {
+          transitionToSection(section);
+          renderLegend(section);
+        }
       });
     }, { threshold: 0.1 });
 
     document.querySelectorAll('[data-section]').forEach(s => observer.observe(s));
 
-    // ── LCP-block observer: byter karta + legend när varje destination scrollas in ──
-    const lcpObserver = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting || activeSection !== 'lcp') return;
-        const key = 'lcp-' + entry.target.dataset.lcp;
-        transitionToSection(key);
-        const labelEl = document.getElementById('section-label');
-        labelEl.style.opacity = '0';
-        setTimeout(() => {
-          labelEl.textContent = SECTION_LABELS[key] || '';
-          labelEl.style.opacity = '1';
-        }, 200);
-        renderLegend(key);
-      });
-    }, { threshold: 0.5, root: textCol });
-
-    document.querySelectorAll('[data-lcp]').forEach(el => lcpObserver.observe(el));
+    // ── LCP tab-knappar: klick byter destination ──
+    document.querySelectorAll('.lcp-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchLcpDest(btn.dataset.dest));
+    });
   });
 </script>
 
