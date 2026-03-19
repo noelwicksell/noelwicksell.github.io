@@ -846,7 +846,10 @@
     if (key === activeSection) return;
     activeSection = key;
     const v = SECTION_VIEWS[key];
-    if (v) map.fitBounds(v.bounds, { padding: v.padding, duration: v.duration, pitch: v.pitch, bearing: v.bearing });
+    if (v) {
+      const padding = window.innerWidth <= 900 ? 6 : v.padding;
+      map.fitBounds(v.bounds, { padding, duration: v.duration, pitch: v.pitch, bearing: v.bearing });
+    }
     const labelEl = document.getElementById('section-label');
     labelEl.style.opacity = '0';
     setTimeout(() => { labelEl.textContent = SECTION_LABELS[key] || ''; labelEl.style.opacity = '1'; }, 200);
@@ -1330,7 +1333,8 @@
 
     // Fit to intro bounds immediately so initial view matches viewport
     const introView = SECTION_VIEWS['intro'];
-    map.fitBounds(introView.bounds, { padding: introView.padding, pitch: introView.pitch, bearing: introView.bearing, duration: 0 });
+    const initPadding = window.innerWidth <= 900 ? 6 : introView.padding;
+    map.fitBounds(introView.bounds, { padding: initPadding, pitch: introView.pitch, bearing: introView.bearing, duration: 0 });
 
     Object.keys(LCP_DEST).forEach(id => {
       map.on('click', id, e => {
@@ -1379,7 +1383,8 @@
         activeSection = section;
 
         const v = SECTION_VIEWS[section];
-        map.fitBounds(v.bounds, { padding: v.padding, duration: v.duration, pitch: v.pitch, bearing: v.bearing });
+        const pad = window.innerWidth <= 900 ? 6 : v.padding;
+        map.fitBounds(v.bounds, { padding: pad, duration: v.duration, pitch: v.pitch, bearing: v.bearing });
 
         const labelEl = document.getElementById('section-label');
         labelEl.style.opacity = '0';
