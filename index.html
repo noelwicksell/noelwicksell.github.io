@@ -1031,8 +1031,8 @@
     const hint = document.getElementById('swipe-hint');
     if (!hint) return;
 
-    // Dölj direkt om redan sett
-    if (localStorage.getItem('swipeHintSeen')) {
+    // Dölj direkt om redan sett eller redan scrollat
+    if (localStorage.getItem('swipeHintSeen') || textCol.scrollTop > 10) {
       hint.style.display = 'none';
       return;
     }
@@ -1046,7 +1046,8 @@
     // Tona ut efter 3 sekunder
     setTimeout(dismissHint, 3000);
 
-    // Tona ut direkt vid första svep
+    // Tona ut vid scroll eller svep
+    textCol.addEventListener('scroll', dismissHint, { passive: true, once: true });
     document.addEventListener('touchend', function onFirstSwipe() {
       dismissHint();
       document.removeEventListener('touchend', onFirstSwipe);
