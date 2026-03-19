@@ -788,8 +788,6 @@
           <div class="sam-tabs" role="tablist" aria-label="Anläggningsanalys-lager">
             <button class="sam-tab-btn active" data-anlayer="anl-ej"          style="--tab-color:#c0392b">Ej tillgänglig</button>
             <button class="sam-tab-btn"        data-anlayer="anl-tillganglig" style="--tab-color:#27ae60">Tillgänglig</button>
-            <button class="sam-tab-btn"        data-anlayer="anl-lutning"     style="--tab-color:#5bb5c4">Lutning</button>
-            <button class="sam-tab-btn"        data-anlayer="anl-shortest"    style="--tab-color:#1a2744">Kortaste linjer</button>
           </div>
         </div>
         <div class="section-body">
@@ -800,12 +798,6 @@
           </div>
           <div class="sam-panel" data-anpanel="anl-tillganglig">
             <p>Heatmap för <strong>tillgängliga</strong> anläggningar visar var tillgängligheten är som bäst i Uppsala innerstad.</p>
-          </div>
-          <div class="sam-panel" data-anpanel="anl-lutning">
-            <p>Amcoff-nätets vägsegment färgsatta efter <strong>lutning</strong> — ett kompletterande perspektiv på framkomlighet i gatunätet.</p>
-          </div>
-          <div class="sam-panel" data-anpanel="anl-shortest">
-            <p>De <strong>kortaste linjerna</strong> i Amcoff-nätet illustrerar hur stora omvägarna i LCP-rutterna är jämfört med direktlinjen.</p>
           </div>
         </div>
       </div>
@@ -882,7 +874,7 @@
   }
 
   // ── Anläggningsanalys layer cycling ──
-  const ANL_LAYERS = ['anl-ej', 'anl-tillganglig', 'anl-lutning', 'anl-shortest'];
+  const ANL_LAYERS = ['anl-ej', 'anl-tillganglig'];
   let activeAnlLayer = 'anl-ej';
 
   function switchAnlLayer(layer) {
@@ -971,8 +963,6 @@
     anlaggning:        'Analys — Anläggningsanalys',
     'anl-ej':          'Heatmap — Ej tillgänglig',
     'anl-tillganglig': 'Heatmap — Tillgänglig',
-    'anl-lutning':     'Analys — Lutning',
-    'anl-shortest':    'Analys — Kortaste linjer'
   };
 
   const SECTION_ORDER = ['intro', 'vaglutning', 'vagunderlag', 'lcp', 'anlaggning'];
@@ -1198,32 +1188,6 @@
         'circle-stroke-opacity-transition': { duration: 400, delay: 0 }
       },
       layout: { visibility: 'none' }
-    },
-
-    // ── Anläggningsanalys lager 3: Amcoff lutning ──
-    {
-      id: 'sam-lutning', sourceId: 'sam-lutning', file: 'data/amcoff_lutning.geojson',
-      type: 'line',
-      paint: {
-        'line-color': '#5bb5c4',
-        'line-width': 1.5,
-        'line-opacity': 0,
-        'line-opacity-transition': { duration: 400, delay: 0 }
-      },
-      layout: { 'line-join': 'round', visibility: 'none' }
-    },
-
-    // ── Sammanfattning lager 2: Amcoff kortaste linjer ──
-    {
-      id: 'sam-shortest', sourceId: 'sam-shortest', file: 'data/amcoff_shortest_lines.geojson',
-      type: 'line',
-      paint: {
-        'line-color': '#1a2744',
-        'line-width': 1.5,
-        'line-opacity': 0,
-        'line-opacity-transition': { duration: 400, delay: 0 }
-      },
-      layout: { 'line-join': 'round', visibility: 'none' }
     }
   ];
 
@@ -1240,10 +1204,8 @@
     'lcp-stadsparken': ['lcp-stadsparken', 'shortest-stadsparken', ...POI_LAYERS],
     'lcp-vaksala':     ['lcp-vaksala',     'shortest-vt',          ...POI_LAYERS],
     anlaggning:         ['anl-ej', 'innerstad'],  // default: first tab
-    'anl-ej':           ['anl-ej',          'innerstad'],
-    'anl-tillganglig':  ['anl-tillganglig',  'innerstad'],
-    'anl-lutning':      ['sam-lutning',      'innerstad'],
-    'anl-shortest':     ['sam-shortest',     'innerstad']
+    'anl-ej':           ['anl-ej',         'innerstad'],
+    'anl-tillganglig':  ['anl-tillganglig', 'innerstad']
   };
 
   const SECTION_OPACITY = {};
@@ -1322,18 +1284,6 @@
         { type: 'circle', color: '#27ae60', label: 'Tillgänglig (wheelchair=yes)' }
       ]
     },
-    'anl-lutning': {
-      title: 'Amcoff-nät — Lutning',
-      items: [
-        { type: 'line', color: '#5bb5c4', label: 'Vägsegment (lutning)', style: 'solid' }
-      ]
-    },
-    'anl-shortest': {
-      title: 'Amcoff-nät — Kortaste linjer',
-      items: [
-        { type: 'line', color: '#1a2744', label: 'Kortaste linje', style: 'solid' }
-      ]
-    }
   };
 
   // ── State ──
