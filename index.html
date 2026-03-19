@@ -982,20 +982,9 @@
     handleSwipe(touchStartY - e.changedTouches[0].clientY);
   }, { passive: true });
 
-  // Blockera CSS snap-scroll under LCP/anläggnings-sublagerscykling
+  // Blockera ALL native scroll på textCol — handleSwipe sköter navigation en sektion i taget
   textCol.addEventListener('touchmove', e => {
-    const forward = (touchStartY - e.touches[0].clientY) > 0;
-    if (activeSection === 'lcp') {
-      const idx = LCP_DESTS.indexOf(activeLcpDest);
-      if ((forward && idx < LCP_DESTS.length - 1) || (!forward && idx > 0)) {
-        e.preventDefault();
-      }
-    } else if (activeSection === 'anlaggning') {
-      const idx = ANL_LAYERS.indexOf(activeAnlLayer);
-      if ((forward && idx < ANL_LAYERS.length - 1) || (!forward && idx > 0)) {
-        e.preventDefault();
-      }
-    }
+    e.preventDefault();
   }, { passive: false });
 
   // ── Swipe hint (mobil, visas bara vid första besök) ──
