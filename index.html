@@ -71,10 +71,8 @@
     /* ── Section ── */
     .section {
       min-height: 100vh;
-      padding: 60px 40px 60px 48px;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       border-bottom: 1px solid var(--glass-border);
       transition: opacity 0.5s ease;
     }
@@ -82,25 +80,31 @@
     .section.dimmed { opacity: 0.3; }
 
     .section-inner {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
       transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
-    .section.dimmed .section-inner {
-      transform: translateY(10px);
-    }
+    .section.dimmed .section-inner { transform: translateY(10px); }
+    .section:not(.dimmed) .section-inner { transform: translateY(0); }
 
-    .section:not(.dimmed) .section-inner {
-      transform: translateY(0);
-    }
-
-    .section-inner {
-      background: var(--glass-bg);
+    /* Rubrikblock — fastnar överst vid scroll */
+    .section-header {
+      padding: 56px 52px 28px 52px;
+      background: rgba(255,255,255,0.60);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--glass-border);
-      border-radius: 16px;
-      padding: 36px 32px;
-      max-width: 560px;
+      border-bottom: 1px solid var(--glass-border);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    /* Innehållsblock — flödar neråt */
+    .section-body {
+      padding: 32px 52px 64px 52px;
+      flex: 1;
     }
 
     .section-number {
@@ -109,29 +113,29 @@
       letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--teal);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     h1 {
-      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-size: clamp(1.8rem, 3.2vw, 2.6rem);
       font-weight: 700;
-      line-height: 1.2;
-      margin-bottom: 8px;
+      line-height: 1.15;
+      margin-bottom: 10px;
       color: var(--text);
     }
 
     h2 {
-      font-size: clamp(1.2rem, 2.2vw, 1.6rem);
-      font-weight: 600;
-      line-height: 1.3;
-      margin-bottom: 8px;
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 10px;
       color: var(--text);
     }
 
     .subtitle {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: var(--teal);
-      margin-bottom: 20px;
+      margin-bottom: 0;
       font-weight: 500;
     }
 
@@ -405,14 +409,15 @@
         flex-shrink: 0;
       }
 
-      .section {
-        min-height: auto;
-        padding: 32px 20px;
+      .section { min-height: auto; }
+
+      .section-header {
+        padding: 28px 20px 16px 20px;
+        position: static;
       }
 
-      .section-inner {
-        padding: 20px 16px;
-        max-width: 100%;
+      .section-body {
+        padding: 16px 20px 36px 20px;
       }
 
       .team-grid { grid-template-columns: 1fr; }
@@ -595,99 +600,103 @@
     <!-- 1. Inledning -->
     <section class="section" data-section="intro">
       <div class="section-inner">
-        <div class="section-number">01 / Inledning</div>
-        <h1>Rullstolstillgänglighet i Uppsala innerstad</h1>
-        <p class="subtitle">En rumslig analys av framkomlighet</p>
-
-        <p>Hur tillgänglig är Uppsala innerstad för rullstolsanvändare? FN:s Agenda 2030, mål 11 <em>Hållbara städer och samhällen</em>, betonar behovet av inkluderande stadsplanering. I Uppsala pågår arbetet med en ny innerstadsstrategi — och paraplyföreningen <strong>Funktionsrätt Uppsala</strong> har lyft kritiska brister: problematiska markbeläggningar, hinder på gångvägar och bristande tillgänglighet längs Fyrisån.</p>
-
-        <p>Denna studie kartlägger och analyserar rullstolsframkomlighet i Uppsalas centrala delar genom GIS-analyser av väglutning, vägunderlag och optimala rutter.</p>
-
-        <div class="pill-row">
-          <span class="pill">FN:s mål 11.2</span>
-          <span class="pill">FN:s mål 11.7</span>
-          <span class="pill">GIS-analys</span>
-          <span class="pill">Uppsala innerstad</span>
+        <div class="section-header">
+          <div class="section-number">01 / Inledning</div>
+          <h1>Rullstolstillgänglighet i Uppsala innerstad</h1>
+          <p class="subtitle">En rumslig analys av framkomlighet · GIS 2 · Uppsala universitet · 2025</p>
         </div>
+        <div class="section-body">
+          <p>Hur tillgänglig är Uppsala innerstad för rullstolsanvändare? FN:s Agenda 2030, mål 11 <em>Hållbara städer och samhällen</em>, betonar behovet av inkluderande stadsplanering. I Uppsala pågår arbetet med en ny innerstadsstrategi — och paraplyföreningen <strong>Funktionsrätt Uppsala</strong> har lyft kritiska brister: problematiska markbeläggningar, hinder på gångvägar och bristande tillgänglighet längs Fyrisån.</p>
 
-        <div class="team-grid">
-          <div class="team-member"><strong>Axel Edlund</strong>Kulturgeografiska inst.</div>
-          <div class="team-member"><strong>Isak Karlsson</strong>Kulturgeografiska inst.</div>
-          <div class="team-member"><strong>Simon Normelius</strong>Kulturgeografiska inst.</div>
-          <div class="team-member"><strong>Noel Wicksell</strong>Kulturgeografiska inst.</div>
+          <p>Denna studie kartlägger och analyserar rullstolsframkomlighet i Uppsalas centrala delar genom GIS-analyser av väglutning, vägunderlag och optimala rutter.</p>
+
+          <div class="pill-row">
+            <span class="pill">FN:s mål 11.2</span>
+            <span class="pill">FN:s mål 11.7</span>
+            <span class="pill">GIS-analys</span>
+            <span class="pill">Uppsala innerstad</span>
+          </div>
+
+          <div class="team-grid">
+            <div class="team-member"><strong>Axel Edlund</strong>Kulturgeografiska inst.</div>
+            <div class="team-member"><strong>Isak Karlsson</strong>Kulturgeografiska inst.</div>
+            <div class="team-member"><strong>Simon Normelius</strong>Kulturgeografiska inst.</div>
+            <div class="team-member"><strong>Noel Wicksell</strong>Kulturgeografiska inst.</div>
+          </div>
         </div>
-
-        <p style="font-size:0.78rem; color: rgba(232,234,246,0.4); margin-top:8px;">GIS 2 · Uppsala universitet · 2025</p>
       </div>
     </section>
 
     <!-- 2. Väglutning -->
     <section class="section dimmed" data-section="vaglutning">
       <div class="section-inner">
-        <div class="section-number">02 / Metod</div>
-        <h2>Väglutning</h2>
-        <p class="subtitle">Road Slope Calculator · 50 m-segment</p>
-
-        <p>Gatans lutning är en av de viktigaste faktorerna för rullstolsframkomlighet. Analysen genomfördes med QGIS-tillägget <strong>Road Slope Calculator</strong>, som kombinerar Lantmäteriets höjdmodell (1 m upplösning) med vägnätverket från Trafikverket och OpenStreetMap.</p>
-
-        <div class="formula-box">Lutning (%) = (ΔZ / Δd) × 100</div>
-
-        <p>Vägnätverket delades upp i <strong>50 m-segment</strong> för tillräcklig detaljeringsgrad. Maxgränsen för tillgänglig väglutning sattes till <strong>4 %</strong>, i enlighet med Beale et al. (2013).</p>
-
-        <div class="stat-row">
-          <div class="stat-box">
-            <span class="value">4 %</span>
-            <span class="label">Max tillgänglig lutning</span>
-          </div>
-          <div class="stat-box">
-            <span class="value">50 m</span>
-            <span class="label">Segmentlängd</span>
-          </div>
-          <div class="stat-box">
-            <span class="value">1 m</span>
-            <span class="label">DEM-upplösning</span>
-          </div>
+        <div class="section-header">
+          <div class="section-number">02 / Metod</div>
+          <h2>Väglutning</h2>
+          <p class="subtitle">Road Slope Calculator · 50 m-segment</p>
         </div>
+        <div class="section-body">
+          <p>Gatans lutning är en av de viktigaste faktorerna för rullstolsframkomlighet. Analysen genomfördes med QGIS-tillägget <strong>Road Slope Calculator</strong>, som kombinerar Lantmäteriets höjdmodell (1 m upplösning) med vägnätverket från Trafikverket och OpenStreetMap.</p>
 
-        <p>Beale et al. (2013) identifierar 4 % som den kritiska gränsen — ett gatusegment med lutning över detta innebär svår eller omöjlig framkomlighet utan assistans.</p>
+          <div class="formula-box">Lutning (%) = (ΔZ / Δd) × 100</div>
 
-        <!-- TODO: Lägg till GeoJSON-lager här för sektion "vaglutning" -->
-        <!-- TODO: Lägg till legend för väglutning -->
+          <p>Vägnätverket delades upp i <strong>50 m-segment</strong> för tillräcklig detaljeringsgrad. Maxgränsen för tillgänglig väglutning sattes till <strong>4 %</strong>, i enlighet med Beale et al. (2013).</p>
+
+          <div class="stat-row">
+            <div class="stat-box">
+              <span class="value">4 %</span>
+              <span class="label">Max tillgänglig lutning</span>
+            </div>
+            <div class="stat-box">
+              <span class="value">50 m</span>
+              <span class="label">Segmentlängd</span>
+            </div>
+            <div class="stat-box">
+              <span class="value">1 m</span>
+              <span class="label">DEM-upplösning</span>
+            </div>
+          </div>
+
+          <p>Beale et al. (2013) identifierar 4 % som den kritiska gränsen — ett gatusegment med lutning över detta innebär svår eller omöjlig framkomlighet utan assistans.</p>
+        </div>
       </div>
     </section>
 
     <!-- 3. Vägunderlag -->
     <section class="section dimmed" data-section="vagunderlag">
       <div class="section-inner">
-        <div class="section-number">03 / Metod</div>
-        <h2>Vägunderlag</h2>
-        <p class="subtitle">Silver Ways-data + manuell komplettering</p>
+        <div class="section-header">
+          <div class="section-number">03 / Metod</div>
+          <h2>Vägunderlag</h2>
+          <p class="subtitle">Silver Ways-data + manuell komplettering</p>
+        </div>
+        <div class="section-body">
+          <p>Vägunderlagets typ påverkar kraftigt framkomligheten i rullstol. Data för markbeläggning hämtades från <strong>Silver Ways</strong> (Jan Amcoff, Uppsala universitet) och kompletterades manuellt med hjälp av <strong>Google Street View</strong>.</p>
 
-        <p>Vägunderlagets typ påverkar kraftigt framkomligheten i rullstol. Data för markbeläggning hämtades från <strong>Silver Ways</strong> (Jan Amcoff, Uppsala universitet) och kompletterades manuellt med hjälp av <strong>Google Street View</strong>.</p>
+          <p>Ytorna klassificerades och viktades efter friktionskoefficient — hårdare och jämnare underlag ger lägre kostnadsvärde:</p>
 
-        <p>Ytorna klassificerades och viktades efter friktionskoefficient — hårdare och jämnare underlag ger lägre kostnadsvärde:</p>
+          <ul class="info-list">
+            <li><span>Asfalt</span><span class="tag">Kostnad: 1</span></li>
+            <li><span>Betongplattor</span><span class="tag">Kostnad: 3</span></li>
+            <li><span>Trä / Brygga</span><span class="tag">Kostnad: 1</span></li>
+            <li><span>Gatsten / Kullerstensgata</span><span class="tag">Kostnad: 7</span></li>
+            <li><span>Grus / Gräs</span><span class="tag">Kostnad: 10</span></li>
+          </ul>
 
-        <ul class="info-list">
-          <li><span>Asfalt</span><span class="tag">Kostnad: 1</span></li>
-          <li><span>Betongplattor</span><span class="tag">Kostnad: 3</span></li>
-          <li><span>Trä / Brygga</span><span class="tag">Kostnad: 1</span></li>
-          <li><span>Gatsten / Kullerstensgata</span><span class="tag">Kostnad: 7</span></li>
-          <li><span>Grus / Gräs</span><span class="tag">Kostnad: 10</span></li>
-        </ul>
-
-        <p>Gatsten dominerar många historiska gator i centrum och utgör ett av de största hindren för rullstolsframkomlighet i Uppsala innerstad.</p>
-
-        <!-- TODO: Lägg till GeoJSON-lager här för sektion "vagunderlag" -->
+          <p>Gatsten dominerar många historiska gator i centrum och utgör ett av de största hindren för rullstolsframkomlighet i Uppsala innerstad.</p>
+        </div>
       </div>
     </section>
 
     <!-- 4. Least Cost Path -->
     <section class="section dimmed" data-section="lcp">
       <div class="section-inner">
-        <div class="section-number">04 / Analys</div>
-        <h2>Least Cost Path</h2>
-        <p class="subtitle">Multikriterieanalys: lutning + underlag</p>
-
+        <div class="section-header">
+          <div class="section-number">04 / Analys</div>
+          <h2>Least Cost Path</h2>
+          <p class="subtitle">Multikriterieanalys: lutning + underlag</p>
+        </div>
+        <div class="section-body">
         <p>En <strong>Least Cost Path (LCP)</strong>-analys identifierar den rutt med lägst samlad kostnad — inte den kortaste sträckan, utan den mest framkomliga för rullstol. Välj en destination för att jämföra LCP mot kortaste väg.</p>
 
         <!-- Tab-knappar -->
@@ -754,58 +763,62 @@
           <p>Lägst totalkostnad av alla destinationer (2 269). Vaksala torg nås via relativt plana och välbelagda gator norr om centralstationen.</p>
         </div>
 
+        </div><!-- /section-body -->
       </div>
     </section>
 
     <!-- 5. Anläggningsanalys -->
     <section class="section dimmed" data-section="anlaggning">
       <div class="section-inner">
-        <div class="section-number">05 / Analys</div>
-        <h2>Anläggningsanalys</h2>
-        <p class="subtitle">Wheelmap / OSM · Kernel Density</p>
+        <div class="section-header">
+          <div class="section-number">05 / Analys</div>
+          <h2>Anläggningsanalys</h2>
+          <p class="subtitle">Wheelmap / OSM · Kernel Density</p>
+        </div>
+        <div class="section-body">
+          <p>Utöver gatunätverket analyserades enskilda platser och anläggningar med avseende på tillgänglighet. Data hämtades från <strong>Wheelmap</strong> och <strong>OpenStreetMap</strong> via wheelchair-taggen.</p>
 
-        <p>Utöver gatunätverket analyserades enskilda platser och anläggningar med avseende på tillgänglighet. Data hämtades från <strong>Wheelmap</strong> och <strong>OpenStreetMap</strong> via wheelchair-taggen.</p>
+          <ul class="info-list">
+            <li><span>wheelchair=yes</span><span class="tag" style="color:#4caf50;">Tillgänglig</span></li>
+            <li><span>wheelchair=limited</span><span class="tag" style="color:#ff9800;">Begränsad</span></li>
+            <li><span>wheelchair=no</span><span class="tag" style="color:#ef5350;">Otillgänglig</span></li>
+          </ul>
 
-        <ul class="info-list">
-          <li><span>wheelchair=yes</span><span class="tag" style="color:#4caf50;">Tillgänglig</span></li>
-          <li><span>wheelchair=limited</span><span class="tag" style="color:#ff9800;">Begränsad</span></li>
-          <li><span>wheelchair=no</span><span class="tag" style="color:#ef5350;">Otillgänglig</span></li>
-        </ul>
-
-        <p>Kernel Density-analys (KDE) användes för att identifiera koncentrationer av tillgängliga respektive otillgängliga platser — ett heatmap-perspektiv på var tillgängligheten är som bäst och sämst.</p>
-
-        <!-- TODO: Lägg till popups för POI-punkter -->
-        <!-- TODO: Lägg till KDE-lager som raster overlay -->
+          <p>Kernel Density-analys (KDE) användes för att identifiera koncentrationer av tillgängliga respektive otillgängliga platser — ett heatmap-perspektiv på var tillgängligheten är som bäst och sämst.</p>
+        </div>
       </div>
     </section>
 
     <!-- 6. Sammanfattning -->
     <section class="section dimmed" data-section="sammanfattning">
       <div class="section-inner">
-        <div class="section-number">06 / Slutsats</div>
-        <h2>Sammanfattning &amp; diskussion</h2>
-        <p class="subtitle">Vad visar analyserna — och vad saknas?</p>
+        <div class="section-header">
+          <div class="section-number">06 / Slutsats</div>
+          <h2>Sammanfattning &amp; diskussion</h2>
+          <p class="subtitle">Vad visar analyserna — och vad saknas?</p>
+        </div>
+        <div class="section-body">
+          <p>Analyserna visar att Uppsala innerstad har stora variationer i tillgänglighet för rullstolsanvändare. Historiska gatumiljöer med gatsten och kuperade partier nära slottsbacken utgör de tydligaste hindren.</p>
 
-        <p>Analyserna visar att Uppsala innerstad har stora variationer i tillgänglighet för rullstolsanvändare. Historiska gatumiljöer med gatsten och kuperade partier nära slottsbacken utgör de tydligaste hindren.</p>
+          <p>LCP-rutterna avviker markant från de kortaste vägarna i flera fall, vilket visar att optimal framkomlighet kräver omvägar för att undvika branta eller ojämna partier.</p>
 
-        <p>LCP-rutterna avviker markant från de kortaste vägarna i flera fall, vilket visar att optimal framkomlighet kräver omvägar för att undvika branta eller ojämna partier.</p>
+          <p><strong>Kunskapsluckor i studien:</strong></p>
 
-        <p><strong>Kunskapsluckor i studien:</strong></p>
+          <ul class="info-list">
+            <li><span>Vägbredd</span><span class="tag" style="color:#ff9800;">Saknas i data</span></li>
+            <li><span>Trottoarkanter / kantstöd</span><span class="tag" style="color:#ff9800;">Saknas i data</span></li>
+            <li><span>Barriärer (stolpar, pollare)</span><span class="tag" style="color:#ff9800;">Saknas i data</span></li>
+            <li><span>Övergångsställens utformning</span><span class="tag" style="color:#ff9800;">Saknas i data</span></li>
+          </ul>
 
-        <ul class="info-list">
-          <li><span>Vägbredd</span><span class="tag" style="color:#ff9800;">Saknas i data</span></li>
-          <li><span>Trottoarkanter / kantstöd</span><span class="tag" style="color:#ff9800;">Saknas i data</span></li>
-          <li><span>Barriärer (stolpar, pollare)</span><span class="tag" style="color:#ff9800;">Saknas i data</span></li>
-          <li><span>Övergångsställens utformning</span><span class="tag" style="color:#ff9800;">Saknas i data</span></li>
-        </ul>
+          <p>För mer nyanserade analyser krävs bättre och mer detaljerade data. Studien visar att GIS-verktyg har stor potential för tillgänglighetsanalys — men är beroende av datakvalitet.</p>
 
-        <p>För mer nyanserade analyser krävs bättre och mer detaljerade data. Studien visar att GIS-verktyg har stor potential för tillgänglighetsanalys — men är beroende av datakvalitet.</p>
-
-        <div class="pill-row">
-          <span class="pill">Lantmäteriet DEM</span>
-          <span class="pill">Trafikverket Lastkajen</span>
-          <span class="pill">Silver Ways / J. Amcoff</span>
-          <span class="pill">Wheelmap / OSM</span>
+          <div class="pill-row">
+            <span class="pill">Lantmäteriet DEM</span>
+            <span class="pill">Trafikverket Lastkajen</span>
+            <span class="pill">Silver Ways / J. Amcoff</span>
+            <span class="pill">Wheelmap / OSM</span>
+          </div>
         </div>
       </div>
     </section>
