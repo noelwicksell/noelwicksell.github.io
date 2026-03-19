@@ -12,21 +12,24 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg-dark: #b8d4e6;
-      --bg-mid: #cfe3ef;
-      --accent: #1a5276;
-      --accent-light: #2e86c1;
-      --glass-bg: rgba(255,255,255,0.60);
-      --glass-border: rgba(26,39,68,0.15);
-      --text: #1a2744;
-      --text-muted: rgba(26,39,68,0.68);
+      --bg:           #a8c8dc;   /* posterns himmelsblå bakgrund  */
+      --bg-mid:       #bdd5e6;   /* något ljusare variant         */
+      --navy:         #1a2744;   /* mörk marinblå – titlar/footer */
+      --teal:         #5bb5c4;   /* teal – Väglutning-bricka      */
+      --green:        #4a9e6b;   /* grön – Vägunderlag-bricka     */
+      --accent:       #1a2744;   /* primär accent = marinblå      */
+      --accent-light: #5bb5c4;   /* sekundär accent = teal        */
+      --glass-bg:     rgba(255,255,255,0.65);
+      --glass-border: rgba(26,39,68,0.18);
+      --text:         #1a2744;
+      --text-muted:   rgba(26,39,68,0.65);
     }
 
     html { scroll-behavior: smooth; }
 
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(160deg, var(--bg-dark), var(--bg-mid));
+      background: linear-gradient(160deg, var(--bg), var(--bg-mid));
       color: var(--text);
       min-height: 100vh;
     }
@@ -89,9 +92,8 @@
       font-weight: 600;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--accent);
+      color: var(--teal);
       margin-bottom: 12px;
-      opacity: 0.8;
     }
 
     h1 {
@@ -112,9 +114,9 @@
 
     .subtitle {
       font-size: 0.95rem;
-      color: var(--accent-light);
+      color: var(--teal);
       margin-bottom: 20px;
-      font-weight: 400;
+      font-weight: 500;
     }
 
     p {
@@ -135,9 +137,9 @@
 
     .pill {
       border-radius: 999px;
-      background: rgba(26,82,118,0.12);
-      color: var(--accent);
-      border: 1px solid rgba(26,82,118,0.25);
+      background: var(--navy);
+      color: #fff;
+      border: 1px solid var(--navy);
       font-size: 0.75rem;
       font-weight: 500;
       padding: 4px 14px;
@@ -151,8 +153,8 @@
     }
 
     .stat-box {
-      background: rgba(26,82,118,0.08);
-      border: 1px solid rgba(26,82,118,0.18);
+      background: rgba(26,39,68,0.08);
+      border: 1px solid rgba(26,39,68,0.22);
       border-radius: 10px;
       padding: 12px 18px;
       flex: 1;
@@ -162,7 +164,7 @@
     .stat-box .value {
       font-size: 1.4rem;
       font-weight: 700;
-      color: var(--accent);
+      color: var(--navy);
       display: block;
     }
 
@@ -174,13 +176,13 @@
     }
 
     .formula-box {
-      background: rgba(26,82,118,0.08);
-      border: 1px solid var(--glass-border);
+      background: rgba(26,39,68,0.07);
+      border: 1px solid rgba(26,39,68,0.20);
       border-radius: 8px;
       padding: 12px 16px;
       font-family: 'Courier New', monospace;
       font-size: 0.85rem;
-      color: var(--accent);
+      color: var(--navy);
       margin: 14px 0;
       text-align: center;
     }
@@ -203,8 +205,8 @@
     .info-list li:last-child { border-bottom: none; }
 
     .info-list li span.tag {
-      color: var(--accent);
-      font-weight: 500;
+      color: var(--navy);
+      font-weight: 600;
       white-space: nowrap;
     }
 
@@ -237,14 +239,14 @@
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(255,255,255,0.85);
-      border: 1px solid var(--glass-border);
+      background: var(--navy);
+      border: 1px solid var(--navy);
       backdrop-filter: blur(8px);
       border-radius: 999px;
       padding: 6px 18px;
       font-size: 0.78rem;
       font-weight: 500;
-      color: var(--accent);
+      color: #fff;
       letter-spacing: 0.05em;
       z-index: 20;
       pointer-events: none;
@@ -271,7 +273,7 @@
     }
 
     .dot.active {
-      background: var(--accent);
+      background: var(--navy);
       transform: scale(1.3);
     }
 
@@ -312,7 +314,7 @@
     /* ── Scrollbar ── */
     #text-col::-webkit-scrollbar { width: 4px; }
     #text-col::-webkit-scrollbar-track { background: transparent; }
-    #text-col::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+    #text-col::-webkit-scrollbar-thumb { background: var(--navy); border-radius: 2px; }
   </style>
 </head>
 <body>
