@@ -381,44 +381,37 @@
 
     /* ── Mobile ── */
     @media (max-width: 768px) {
-      /* Återställ body-scroll på mobil */
-      html, body {
-        overflow: auto;
-        height: auto;
-      }
-
       #app {
         flex-direction: column;
-        height: auto;
-        overflow: visible;
+        height: 100vh;
+        overflow: hidden;
       }
 
-      /* Text överst */
+      /* Text överst — scrollar inuti sig själv */
       #text-col {
         order: 1;
         width: 100%;
-        height: auto;
-        overflow-y: visible;
+        height: 55vh;
+        overflow-y: auto;
+        flex-shrink: 0;
       }
 
-      /* Karta underst, sticky längst ned */
+      /* Karta nederkant — alltid synlig */
       #map-col {
         order: 2;
         width: 100%;
         height: 45vh;
-        position: sticky;
-        bottom: 0;
-        top: auto;
-        z-index: 5;
+        position: relative;
+        flex-shrink: 0;
       }
 
       .section {
         min-height: auto;
-        padding: 40px 20px;
+        padding: 32px 20px;
       }
 
       .section-inner {
-        padding: 24px 20px;
+        padding: 20px 16px;
         max-width: 100%;
       }
 
@@ -868,24 +861,21 @@
   map.scrollZoom.disable();
   map.addControl(new maplibregl.NavigationControl({ showCompass: true }), 'top-right');
 
-  // ── Redirect wheel-scroll till #text-col (endast desktop) ──
+  // ── Redirect wheel-scroll till #text-col ──
+  // På mobil scrollar #text-col direkt via touch — ingen redirect behövs.
   const textCol = document.getElementById('text-col');
-  const isMobile = () => window.innerWidth <= 768;
 
   document.addEventListener('wheel', e => {
-    if (isMobile()) return;
     e.preventDefault();
     textCol.scrollBy({ top: e.deltaY, behavior: 'auto' });
   }, { passive: false });
 
-  // Touch på kartan → scrolla text-col (endast desktop/tablet liggande)
+  // Touch på kartan → scrolla text-col (desktop/tablet liggande)
   let touchStartY = 0;
   document.getElementById('map-col').addEventListener('touchstart', e => {
-    if (isMobile()) return;
     touchStartY = e.touches[0].clientY;
   }, { passive: true });
   document.getElementById('map-col').addEventListener('touchmove', e => {
-    if (isMobile()) return;
     const dy = touchStartY - e.touches[0].clientY;
     touchStartY = e.touches[0].clientY;
     textCol.scrollBy({ top: dy, behavior: 'auto' });
