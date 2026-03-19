@@ -842,11 +842,27 @@
   }
 
   // ── Sektionsnavigering ──
+  function activateSection(key) {
+    if (key === activeSection) return;
+    activeSection = key;
+    const v = SECTION_VIEWS[key];
+    if (v) map.fitBounds(v.bounds, { padding: v.padding, duration: v.duration, pitch: v.pitch, bearing: v.bearing });
+    const labelEl = document.getElementById('section-label');
+    labelEl.style.opacity = '0';
+    setTimeout(() => { labelEl.textContent = SECTION_LABELS[key] || ''; labelEl.style.opacity = '1'; }, 200);
+    updateProgressNav(key);
+    document.querySelectorAll('[data-section]').forEach(s => s.classList.toggle('dimmed', s.dataset.section !== key));
+    if (key === 'lcp') switchLcpDest(activeLcpDest);
+    else if (key === 'anlaggning') switchAnlLayer(activeAnlLayer);
+    else { transitionToSection(key); renderLegend(key); }
+  }
+
   function scrollToSection(key) {
     const el = document.querySelector('[data-section="' + key + '"]');
     if (!el) return;
     if (window.innerWidth <= 900) {
       textCol.scrollTop = el.offsetTop;
+      activateSection(key);
     } else {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
