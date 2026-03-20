@@ -646,13 +646,13 @@
 
     /* Kompakt sidhuvud — liten höjd i landscape */
     .sidebar-header { padding: 7px 20px 6px; }
-    .sidebar-header h1 { font-size: 1.05rem; }
+    .sidebar-header h1 { font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* Kompakta sektionsrubriker */
     .section-header { padding: 6px 20px 6px; }
     .section-number { display: none; }
     h2 { font-size: 0.95rem; margin-bottom: 1px; }
-    .section-header .subtitle { font-size: 0.70rem; }
+    .section-header .subtitle { font-size: 0.70rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .lcp-tabs, .sam-tabs { margin-top: 3px; gap: 3px; }
     .lcp-tab-btn, .sam-tab-btn { padding: 4px 6px; font-size: 10px; }
     .lcp-tabs { grid-template-columns: repeat(4, 1fr); }
