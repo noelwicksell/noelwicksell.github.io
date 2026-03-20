@@ -513,12 +513,21 @@
 
     @media (max-width: 900px) and (orientation: landscape) {
       #legend {
-        max-height: 22vh;
-        overflow-y: auto;
+        max-height: none;
         padding: 8px 12px;
+        min-width: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 14px;
+        align-items: center;
       }
-      .legend-title { margin-bottom: 5px; padding-bottom: 4px; font-size: 9px; }
-      .legend-item { margin-bottom: 3px; font-size: 10px; gap: 7px; }
+      .legend-title {
+        grid-column: 1 / -1;
+        margin-bottom: 5px;
+        padding-bottom: 4px;
+        font-size: 9px;
+      }
+      .legend-item { margin-bottom: 3px; font-size: 10px; gap: 6px; }
     }
 
     /* ── Mobile ── */
