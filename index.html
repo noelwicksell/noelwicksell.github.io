@@ -464,58 +464,51 @@
       white-space: nowrap;
     }
 
-    /* ── Inline legend (mobil, mellan text och karta) ── */
-    #legend-inline {
-      display: none;
-    }
-
-    @media (max-width: 900px) {
-      #legend-inline {
-        display: block;
-        background: rgba(255,255,255,0.88);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        border-top: 1px solid rgba(27,51,73,0.10);
-        border-bottom: 1px solid rgba(27,51,73,0.10);
-        padding: 7px 14px;
-        flex-shrink: 0;
-        transition: opacity 0.3s;
-      }
-
-      #legend-inline.legend-hidden {
-        display: none;
-      }
-
-      #legend-inline .legend-title {
-        font-size: 9px;
-        padding-bottom: 5px;
-        margin-bottom: 5px;
-      }
-
-      #legend-inline .legend-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 4px 12px;
-      }
-
-      #legend-inline .legend-item {
-        font-size: 10px;
-        margin-bottom: 0;
-      }
-
-      #legend-inline .legend-swatch-line { width: 20px; }
-      #legend-inline .legend-swatch-circle { width: 11px; height: 11px; }
-      #legend-inline .legend-swatch-gradient { width: 48px; }
-    }
-
     /* ── Legend toggle (mobil) ── */
     #legend-toggle {
       display: none;
     }
 
     @media (max-width: 900px) {
-      #legend-toggle { display: none !important; }
-      #legend { display: none !important; }
+      #legend-toggle {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        position: absolute;
+        bottom: 14px;
+        right: 14px;
+        z-index: 25;
+        background: var(--navy);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 13px;
+        font-size: 11px;
+        font-weight: 700;
+        font-family: 'Inter', sans-serif;
+        letter-spacing: 0.04em;
+        cursor: pointer;
+        box-shadow: var(--shadow);
+        transition: opacity 0.2s;
+      }
+
+      #legend-toggle.has-legend { opacity: 1; }
+      #legend-toggle:not(.has-legend) { opacity: 0; pointer-events: none; }
+
+      #legend {
+        bottom: 52px;
+        right: 14px;
+        max-height: 38vh;
+        overflow-y: auto;
+        transform: translateY(8px);
+        transition: opacity 0.3s, transform 0.3s;
+      }
+
+      #legend.mobile-hidden {
+        opacity: 0 !important;
+        display: none !important;
+        transform: translateY(8px);
+      }
     }
 
     /* ── Mobile ── */
@@ -807,7 +800,6 @@
 
 
     </div><!-- /text-col -->
-    <div id="legend-inline" class="legend-hidden"></div>
   </aside>
 
   <main id="map-col">
@@ -1379,14 +1371,11 @@
 
   // ── Legend renderer ──
   function renderLegend(section) {
-    const el       = document.getElementById('legend');
-    const elInline = document.getElementById('legend-inline');
+    const el  = document.getElementById('legend');
     const cfg = LEGENDS[section];
     if (!cfg) {
       el.style.opacity = '0';
       setTimeout(() => { el.style.display = 'none'; el.innerHTML = ''; }, 350);
-      elInline.classList.add('legend-hidden');
-      elInline.innerHTML = '';
       return;
     }
     el.style.display = 'block';
@@ -1413,8 +1402,6 @@
       </div>`;
     }).join('');
     el.innerHTML = `<div class="legend-title">${cfg.title}</div>${items}`;
-    elInline.classList.remove('legend-hidden');
-    elInline.innerHTML = `<div class="legend-title">${cfg.title}</div><div class="legend-grid">${items}</div>`;
   }
 
   // ── Progress nav ──
