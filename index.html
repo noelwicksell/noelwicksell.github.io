@@ -617,6 +617,48 @@
       width: 100%;
     }
   }
+
+  /* Expand-knappen visas bara i porträttläge — dölj som default */
+  #map-expand-btn { display: none; }
+
+  /* ── Liggande läge på mobil (≤900 px bredd, landscape) ── */
+  @media (max-width: 900px) and (orientation: landscape) {
+    /* Sidebar: begränsa bredden så kartan alltid får gott om utrymme */
+    #sidebar { width: min(440px, 48%); }
+
+    /* Kompakt sidhuvud — liten höjd i landscape */
+    .sidebar-header { padding: 7px 20px 6px; }
+    .sidebar-header h1 { font-size: 1.05rem; }
+
+    /* Kompakta sektionsrubriker */
+    .section-header { padding: 6px 20px 6px; }
+    .section-number { display: none; }
+    h2 { font-size: 0.95rem; margin-bottom: 1px; }
+    .section-header .subtitle { font-size: 0.70rem; }
+    .lcp-tabs, .sam-tabs { margin-top: 3px; gap: 3px; }
+    .lcp-tab-btn, .sam-tab-btn { padding: 4px 6px; font-size: 10px; }
+    .lcp-tabs { grid-template-columns: repeat(4, 1fr); }
+
+    /* Kompakt brödtext */
+    .section-body { padding: 6px 20px 12px; }
+    p { font-size: 0.76rem; line-height: 1.35; margin-bottom: 4px; }
+    .content-card { padding: 8px; margin-bottom: 5px; border-radius: 10px; }
+    .stat-row { gap: 4px; margin: 4px 0; }
+    .stat-box { padding: 6px 8px; }
+    .stat-box .value { font-size: 0.95rem; }
+    .stat-box .label { font-size: 0.60rem; }
+
+    .pill-row { margin: 3px 0; gap: 4px; }
+    .pill { font-size: 9px; padding: 3px 7px; }
+
+    .team-grid { gap: 3px; margin: 3px 0; }
+    .team-member { padding: 5px 8px; font-size: 0.68rem; }
+    .team-member strong { font-size: 0.73rem; }
+
+    .formula-box { padding: 7px; font-size: 0.76rem; margin: 5px 0; }
+    .info-list { margin: 4px 0; }
+    .info-list li { font-size: 0.76rem; padding: 3px 0; }
+  }
   </style>
 </head>
 <body>
