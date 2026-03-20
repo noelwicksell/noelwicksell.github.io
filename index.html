@@ -469,7 +469,7 @@
       display: none;
     }
 
-    @media (max-width: 900px) and (orientation: portrait) {
+    @media (max-width: 900px) {
       #legend-toggle {
         display: flex;
         align-items: center;
@@ -513,21 +513,20 @@
 
     @media (max-width: 900px) and (orientation: landscape) {
       #legend {
-        max-height: none;
-        padding: 8px 12px;
+        max-height: 28vh;
+        padding: 6px 10px;
         min-width: 0;
         display: grid;
         grid-template-columns: 1fr 1fr;
-        column-gap: 14px;
-        align-items: center;
+        column-gap: 12px;
       }
       .legend-title {
         grid-column: 1 / -1;
-        margin-bottom: 5px;
+        margin-bottom: 4px;
         padding-bottom: 4px;
         font-size: 9px;
       }
-      .legend-item { margin-bottom: 3px; font-size: 10px; gap: 6px; }
+      .legend-item { margin-bottom: 2px; font-size: 10px; gap: 6px; }
     }
 
     /* ── Mobile ── */
