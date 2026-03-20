@@ -469,7 +469,7 @@
       display: none;
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 900px) and (orientation: portrait) {
       #legend-toggle {
         display: flex;
         align-items: center;
@@ -512,7 +512,7 @@
     }
 
     /* ── Mobile ── */
-    @media (max-width: 900px) {
+    @media (max-width: 900px) and (orientation: portrait) {
       #app { flex-direction: column; height: 100vh; height: 100svh; }
       #sidebar { width: 100%; height: auto; flex: 3; min-height: 0; }
       #map-col { height: auto; flex: 2; min-height: 0; }
@@ -551,7 +551,7 @@
     }
 
   /* Swipe hint — bara mobil */
-  @media (max-width: 900px) {
+  @media (max-width: 900px) and (orientation: portrait) {
     #swipe-hint {
       position: fixed;
       bottom: calc(40svh + 12px);
@@ -881,7 +881,7 @@
     renderLegend(key);
     const v = SECTION_VIEWS[key];
     if (v) {
-      const padding = window.innerWidth <= 900 ? 6 : v.padding;
+      const padding = window.matchMedia('(max-width: 900px) and (orientation: portrait)').matches ? 6 : v.padding;
       map.fitBounds(v.bounds, { padding, duration: v.duration, pitch: v.pitch, bearing: v.bearing });
     }
   }
@@ -906,7 +906,7 @@
     activeSection = key;
     const v = SECTION_VIEWS[key];
     if (v) {
-      const padding = window.innerWidth <= 900 ? 6 : v.padding;
+      const padding = window.matchMedia('(max-width: 900px) and (orientation: portrait)').matches ? 6 : v.padding;
       map.fitBounds(v.bounds, { padding, duration: v.duration, pitch: v.pitch, bearing: v.bearing });
     }
     updateProgressNav(key);
@@ -1013,7 +1013,7 @@
 
   // ── Mobile map helskärm + interaktionslås ──
   (function() {
-    if (!window.matchMedia('(max-width: 900px)').matches) return;
+    if (!window.matchMedia('(max-width: 900px) and (orientation: portrait)').matches) return;
 
     map.dragPan.disable();
     map.touchZoomRotate.disable();
@@ -1515,7 +1515,7 @@
         }
 
         const v = SECTION_VIEWS[section];
-        const pad = window.innerWidth <= 900 ? 6 : v.padding;
+        const pad = window.matchMedia('(max-width: 900px) and (orientation: portrait)').matches ? 6 : v.padding;
         map.fitBounds(v.bounds, { padding: pad, duration: v.duration, pitch: v.pitch, bearing: v.bearing });
 
         updateProgressNav(section);
