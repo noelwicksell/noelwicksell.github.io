@@ -677,6 +677,36 @@
     .info-list { margin: 4px 0; }
     .info-list li { font-size: 0.76rem; padding: 3px 0; }
   }
+
+  /* Flödesschema */
+  .flow-diagram { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0; }
+  .flow-col { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .flow-head { background: var(--navy); color: #fff; border-radius: 8px; padding: 5px 8px;
+               font-size: 0.72rem; font-weight: 700; text-align: center; width: 100%; }
+  .flow-head.lcp { background: #2a6496; }
+  .flow-step { background: rgba(255,255,255,0.75); border: 1px solid var(--glass-border);
+               border-radius: 6px; padding: 5px 7px; font-size: 0.65rem; line-height: 1.3;
+               text-align: center; width: 100%; color: var(--text); }
+  .flow-arrow { font-size: 0.7rem; color: var(--text-muted); line-height: 1; }
+  .flow-merge { grid-column: 1/-1; text-align: center; font-size: 0.75rem;
+                color: var(--text-muted); margin: 4px 0 0; }
+  .flow-lcp-row { grid-column: 1/-1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .flow-lcp-row .flow-head { max-width: 180px; }
+  .flow-lcp-row .flow-step { max-width: 260px; }
+
+  .report-link {
+    display: inline-block;
+    margin: 12px 0 0;
+    padding: 9px 18px;
+    background: var(--navy);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .report-link:hover { opacity: 0.82; }
   </style>
 </head>
 <body>
@@ -858,6 +888,76 @@
         </div>
       </section>
 
+      <!-- 6. Slutsats -->
+      <section class="section dimmed" data-section="slutsats">
+        <div class="section-inner">
+          <div class="section-header">
+            <div class="section-number">06</div>
+            <h2>Slutsats</h2>
+            <p class="subtitle">Diskussion &amp; sammanfattning</p>
+          </div>
+          <div class="section-body">
+            <div class="content-card">
+              <p>Genom att kombinera samtliga kartor kan det konstateras att de "historiska" delarna
+              (i förhållande till centrums "modernitet") präglas av betydligt sämre framkomlighet för
+              rullstolsanvändare, både med hänsyn till lutning och vägunderlag. Anläggningsanalysen
+              visar på att dessa områden dessutom har sämre tillgänglighet till anläggningar, vilket i
+              kombination med väganalyserna indikerar en allmänt sämre tillgänglighet i dessa områden —
+              runt Carolina Rediviva och Universitetshuset.</p>
+              <p>Least Cost Path-analysen med utgångspunkt i Stora torget visar att de "optimala"
+              rutterna därmed blir långa omvägar, särskilt vad gäller rutten till Carolina Rediviva.</p>
+            </div>
+
+            <a class="report-link" href="https://docs.google.com/document/d/1NRaVF58LCo8IcVu4Ro-7xImeuwSMuG3QvN25cgq7iFc/edit?usp=sharing" target="_blank" rel="noopener">
+              Läs hela rapporten →
+            </a>
+
+            <div class="content-card" style="margin-top:14px">
+              <p style="font-size:0.75rem;font-weight:700;margin-bottom:8px;color:var(--navy)">Studiens metodik</p>
+              <div class="flow-diagram">
+                <!-- Kolumn 1: Väglutning -->
+                <div class="flow-col">
+                  <div class="flow-head">Väglutning</div>
+                  <div class="flow-arrow">↓</div>
+                  <div class="flow-step">DEM 1m &amp; vägnät (Trafikverket)</div>
+                  <div class="flow-arrow">↓</div>
+                  <div class="flow-step">QGIS Road Slope Calculator</div>
+                  <div class="flow-arrow">↓</div>
+                  <div class="flow-step">Rasterize &amp; Reclassify by table</div>
+                </div>
+                <!-- Kolumn 2: Vägunderlag -->
+                <div class="flow-col">
+                  <div class="flow-head">Vägunderlag</div>
+                  <div class="flow-arrow">↓</div>
+                  <div class="flow-step">KGI-data + manuell komplettering</div>
+                  <div class="flow-arrow">↓</div>
+                  <div class="flow-step">Klassificera kostnader (1–10)</div>
+                  <div class="flow-arrow">↓</div>
+                  <div class="flow-step">Rasterize &amp; Raster Calculator</div>
+                </div>
+                <!-- Kolumn 3: Anläggning -->
+                <div class="flow-col">
+                  <div class="flow-head">Anläggning</div>
+                  <div class="flow-arrow">↓</div>
+                  <div class="flow-step">Wheelmap / OSM (wheelchair-tagg)</div>
+                  <div class="flow-arrow">↓</div>
+                  <div class="flow-step">Klassificera: yes / limited / no</div>
+                  <div class="flow-arrow">↓</div>
+                  <div class="flow-step">KDE Heatmap (QGIS)</div>
+                </div>
+                <!-- Sammanslagning -->
+                <div class="flow-merge">↓&nbsp;&nbsp;&nbsp;↓&nbsp;&nbsp;&nbsp;↓</div>
+                <div class="flow-lcp-row">
+                  <div class="flow-head lcp">Least Cost Path</div>
+                  <div class="flow-arrow">↓</div>
+                  <div class="flow-step">Punkter i QGIS → LCP-tillägg → ArcGIS Pro</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
 
     </div><!-- /text-col -->
   </aside>
@@ -887,6 +987,7 @@
       <button class="progress-dot"        data-target="vagunderlag" aria-label="Gå till Vägunderlag"></button>
       <button class="progress-dot"        data-target="lcp"         aria-label="Gå till Least Cost Path"></button>
       <button class="progress-dot"        data-target="anlaggning"  aria-label="Gå till Anläggningsanalys"></button>
+      <button class="progress-dot"        data-target="slutsats"    aria-label="Gå till Slutsats"></button>
     </nav>
   </main>
 
@@ -1120,7 +1221,8 @@
     'lcp-domkyrkan':   { bounds: [[17.6309, 59.8575], [17.6400, 59.8589]], padding: 48, pitch: 0, bearing: 0, duration: 1200 },
     'lcp-stadsparken': { bounds: [[17.6367, 59.8515], [17.6432, 59.8595]], padding: 48, pitch: 0, bearing: 0, duration: 1200 },
     'lcp-vaksala':     { bounds: [[17.6376, 59.8578], [17.6483, 59.8632]], padding: 48, pitch: 0, bearing: 0, duration: 1200 },
-    anlaggning:        { bounds: [[17.617, 59.849], [17.657, 59.869]], padding: 32, pitch: 0, bearing: 0, duration: 2000 }
+    anlaggning:        { bounds: [[17.617, 59.849], [17.657, 59.869]], padding: 32, pitch: 0, bearing: 0, duration: 2000 },
+    slutsats:          { bounds: [[17.614, 59.847], [17.662, 59.869]], padding: 32, pitch: 0, bearing: 0, duration: 2000 }
   };
 
   const SECTION_LABELS = {
@@ -1137,7 +1239,7 @@
     'anl-tillganglig': 'Heatmap — Tillgänglig'
   };
 
-  const SECTION_ORDER = ['intro', 'vaglutning', 'vagunderlag', 'lcp', 'anlaggning'];
+  const SECTION_ORDER = ['intro', 'vaglutning', 'vagunderlag', 'lcp', 'anlaggning', 'slutsats'];
 
   // ── Layer definitions (lazy-loaded) ──
   const LAYER_DEFS = [
@@ -1279,7 +1381,8 @@
     'lcp-vaksala':     ['lcp-vaksala',     'shortest-vt',          ...POI_LAYERS],
     anlaggning:        ['anl-ej', 'innerstad'],
     'anl-ej':          ['anl-ej',         'innerstad'],
-    'anl-tillganglig': ['anl-tillganglig', 'innerstad']
+    'anl-tillganglig': ['anl-tillganglig', 'innerstad'],
+    slutsats:          ['innerstad', 'poi-labels', 'poi-stora-torget-label']
   };
 
   const SECTION_OPACITY = {};
@@ -1357,7 +1460,9 @@
       items: [
         { type: 'gradient', fromColor: 'rgba(40,167,69,0)', toColor: 'rgba(40,167,69,0.85)', label: 'Låg → hög täthet' }
       ]
-    }
+    },
+
+    slutsats: null
   };
 
   // ── State ──
