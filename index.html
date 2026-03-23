@@ -679,15 +679,20 @@
   }
 
   /* Flödesschema */
-  .flow-compact { margin: 8px 0 0; }
-  .flow-inputs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 5px; }
-  .flow-input { background: var(--navy); color: #fff; border-radius: 7px; padding: 6px 8px; text-align: center; }
-  .flow-input .fi-label { display: block; font-size: 0.7rem; font-weight: 700; }
-  .flow-input .fi-sub { display: block; font-size: 0.6rem; opacity: 0.75; margin-top: 2px; line-height: 1.3; }
-  .flow-mid { text-align: center; font-size: 0.68rem; color: var(--text-muted); padding: 3px 0; }
-  .flow-result { background: #2a6496; color: #fff; border-radius: 7px; padding: 7px 10px; text-align: center; }
-  .flow-result .fr-label { display: block; font-size: 0.72rem; font-weight: 700; }
-  .flow-result .fr-sub { display: block; font-size: 0.62rem; opacity: 0.8; margin-top: 2px; }
+  .flow-diagram { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0; }
+  .flow-col { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .flow-head { background: var(--navy); color: #fff; border-radius: 8px; padding: 5px 8px;
+               font-size: 0.72rem; font-weight: 700; text-align: center; width: 100%; }
+  .flow-head.lcp { background: #2a6496; }
+  .flow-step { background: rgba(255,255,255,0.75); border: 1px solid var(--glass-border);
+               border-radius: 6px; padding: 5px 7px; font-size: 0.65rem; line-height: 1.3;
+               text-align: center; width: 100%; color: var(--text); }
+  .flow-arrow { font-size: 0.7rem; color: var(--text-muted); line-height: 1; }
+  .flow-merge { grid-column: 1/-1; text-align: center; font-size: 0.75rem;
+                color: var(--text-muted); margin: 4px 0 0; }
+  .flow-lcp-row { grid-column: 1/-1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .flow-lcp-row .flow-head { max-width: 180px; }
+  .flow-lcp-row .flow-step { max-width: 260px; }
   [data-section="slutsats"] .section-body { padding-top: 14px; padding-bottom: 14px; }
   [data-section="slutsats"] .content-card { padding: 14px; margin-bottom: 10px; }
 
@@ -908,25 +913,43 @@
 
             <div class="content-card" style="margin-top:12px">
               <p style="font-size:0.75rem;font-weight:700;margin-bottom:8px;color:var(--navy)">Studiens metodik</p>
-              <div class="flow-compact">
-                <div class="flow-inputs">
-                  <div class="flow-input">
-                    <span class="fi-label">Väglutning</span>
-                    <span class="fi-sub">DEM 1m · Road Slope Calculator</span>
-                  </div>
-                  <div class="flow-input">
-                    <span class="fi-label">Vägunderlag</span>
-                    <span class="fi-sub">KGI-data · kostnad 1–10</span>
-                  </div>
-                  <div class="flow-input">
-                    <span class="fi-label">Anläggning</span>
-                    <span class="fi-sub">Wheelmap/OSM · KDE</span>
-                  </div>
+              <div class="flow-diagram">
+                <!-- Kolumn 1: Väglutning -->
+                <div class="flow-col">
+                  <div class="flow-head">Väglutning</div>
+                  <div class="flow-arrow">↓</div>
+                  <div class="flow-step">DEM 1m &amp; vägnät (Trafikverket)</div>
+                  <div class="flow-arrow">↓</div>
+                  <div class="flow-step">QGIS Road Slope Calculator</div>
+                  <div class="flow-arrow">↓</div>
+                  <div class="flow-step">Rasterize &amp; Reclassify by table</div>
                 </div>
-                <div class="flow-mid">↓&nbsp;&nbsp;kombineras i kostnadsviktad analys&nbsp;&nbsp;↓</div>
-                <div class="flow-result">
-                  <span class="fr-label">Least Cost Path</span>
-                  <span class="fr-sub">QGIS LCP-tillägg → ArcGIS Pro</span>
+                <!-- Kolumn 2: Vägunderlag -->
+                <div class="flow-col">
+                  <div class="flow-head">Vägunderlag</div>
+                  <div class="flow-arrow">↓</div>
+                  <div class="flow-step">KGI-data + manuell komplettering</div>
+                  <div class="flow-arrow">↓</div>
+                  <div class="flow-step">Klassificera kostnader (1–10)</div>
+                  <div class="flow-arrow">↓</div>
+                  <div class="flow-step">Rasterize &amp; Raster Calculator</div>
+                </div>
+                <!-- Kolumn 3: Anläggning -->
+                <div class="flow-col">
+                  <div class="flow-head">Anläggning</div>
+                  <div class="flow-arrow">↓</div>
+                  <div class="flow-step">Wheelmap / OSM (wheelchair-tagg)</div>
+                  <div class="flow-arrow">↓</div>
+                  <div class="flow-step">Klassificera: yes / limited / no</div>
+                  <div class="flow-arrow">↓</div>
+                  <div class="flow-step">KDE Heatmap (QGIS)</div>
+                </div>
+                <!-- Sammanslagning -->
+                <div class="flow-merge">↓&nbsp;&nbsp;&nbsp;↓&nbsp;&nbsp;&nbsp;↓</div>
+                <div class="flow-lcp-row">
+                  <div class="flow-head lcp">Least Cost Path</div>
+                  <div class="flow-arrow">↓</div>
+                  <div class="flow-step">Punkter i QGIS → LCP-tillägg → ArcGIS Pro</div>
                 </div>
               </div>
             </div>
