@@ -911,47 +911,8 @@
               Läs hela rapporten →
             </a>
 
-            <div class="content-card" style="margin-top:12px">
-              <p style="font-size:0.75rem;font-weight:700;margin-bottom:8px;color:var(--navy)">Studiens metodik</p>
-              <div class="flow-diagram">
-                <!-- Kolumn 1: Väglutning -->
-                <div class="flow-col">
-                  <div class="flow-head">Väglutning</div>
-                  <div class="flow-arrow">↓</div>
-                  <div class="flow-step">DEM 1m &amp; vägnät (Trafikverket)</div>
-                  <div class="flow-arrow">↓</div>
-                  <div class="flow-step">QGIS Road Slope Calculator</div>
-                  <div class="flow-arrow">↓</div>
-                  <div class="flow-step">Rasterize &amp; Reclassify by table</div>
-                </div>
-                <!-- Kolumn 2: Vägunderlag -->
-                <div class="flow-col">
-                  <div class="flow-head">Vägunderlag</div>
-                  <div class="flow-arrow">↓</div>
-                  <div class="flow-step">KGI-data + manuell komplettering</div>
-                  <div class="flow-arrow">↓</div>
-                  <div class="flow-step">Klassificera kostnader (1–10)</div>
-                  <div class="flow-arrow">↓</div>
-                  <div class="flow-step">Rasterize &amp; Raster Calculator</div>
-                </div>
-                <!-- Kolumn 3: Anläggning -->
-                <div class="flow-col">
-                  <div class="flow-head">Anläggning</div>
-                  <div class="flow-arrow">↓</div>
-                  <div class="flow-step">Wheelmap / OSM (wheelchair-tagg)</div>
-                  <div class="flow-arrow">↓</div>
-                  <div class="flow-step">Klassificera: yes / limited / no</div>
-                  <div class="flow-arrow">↓</div>
-                  <div class="flow-step">KDE Heatmap (QGIS)</div>
-                </div>
-                <!-- Sammanslagning -->
-                <div class="flow-merge">↓&nbsp;&nbsp;&nbsp;↓&nbsp;&nbsp;&nbsp;↓</div>
-                <div class="flow-lcp-row">
-                  <div class="flow-head lcp">Least Cost Path</div>
-                  <div class="flow-arrow">↓</div>
-                  <div class="flow-step">Punkter i QGIS → LCP-tillägg → ArcGIS Pro</div>
-                </div>
-              </div>
+            <div class="content-card" style="margin-top:12px;padding:10px">
+              <img src="flodesschema.png" alt="Flödesschema — studiens metodik" style="width:100%;height:auto;display:block;border-radius:6px;">
             </div>
           </div>
         </div>
