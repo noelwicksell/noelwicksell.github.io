@@ -1083,7 +1083,7 @@
   }
 
   function navigateSection(forward) {
-    const secs = ['intro', 'vaglutning', 'vagunderlag', 'lcp', 'anlaggning'];
+    const secs = SECTION_ORDER;
     const next = secs[secs.indexOf(activeSection) + (forward ? 1 : -1)];
     if (next) scrollToSection(next);
   }
@@ -1698,7 +1698,7 @@
           renderLegend(section);
         }
       });
-    }, { threshold: 0.5 });
+    }, { threshold: 0.3 });
 
     document.querySelectorAll('[data-section]').forEach(s => observer.observe(s));
 
